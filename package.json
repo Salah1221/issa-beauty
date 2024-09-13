@@ -1,0 +1,23 @@
+{
+  "name": "issa-beauty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon server/index.js",
+    "build": "pnpm install && pnpm install --prefix client && pnpm --filter client run build",
+    "start": "NODE_ENV=production node server/index.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fs": "0.0.1-security",
+    "mongodb": "^6.8.1",
+    "mongoose": "^8.6.1",
+    "multer": "1.4.5-lts.1"
+  }
+}
