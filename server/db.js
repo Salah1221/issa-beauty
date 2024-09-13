@@ -3,7 +3,7 @@ import { Product } from "./models.js";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.DB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log("Connected to MongoDB " + conn.connection.host);
     // await Product.deleteMany({});
   } catch (e) {
