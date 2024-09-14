@@ -14,10 +14,7 @@ const getAllCategories = async () => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// if (process.env.NODE_ENV !== 'production') {
-//   dotenv.config({ path: path.resolve(__dirname, "../.env") });
-//   // Load environment variables from .env in development
-// }
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
 app.use(express.json());
