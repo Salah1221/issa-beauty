@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:" + PORT,
+        target: "https://issa-beauty.vercel.app/:" + PORT,
       },
     },
   },
