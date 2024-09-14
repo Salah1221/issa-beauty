@@ -82,7 +82,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     homeLoader().then((data) => {
       setProductsByCategory(data);
-      setIsLoading(false);
+      if (data) setIsLoading(false);
     });
   }, []);
 
