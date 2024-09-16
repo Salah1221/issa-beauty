@@ -1,6 +1,5 @@
 import { Category, Product } from "./models.js";
 import express from "express";
-import dotenv from "dotenv";
 import { connectDB } from "./db.js";
 import path from "path";
 import { fileURLToPath } from "url";

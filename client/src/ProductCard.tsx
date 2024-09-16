@@ -37,17 +37,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
             style={{ aspectRatio: 300 / 200 }}
           ></div>
         )}
-        {imageLoaded && (
-          <img
-            src={imageUrl}
-            alt={name}
-            className={`h-[200px] w-full object-cover transition-opacity duration-500 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            onLoad={() => setImageLoaded(true)}
-            style={{ aspectRatio: 300 / 200 }}
-          />
-        )}
+        <img
+          src={imageUrl}
+          alt={name}
+          className={`h-[200px] w-full object-cover transition-opacity duration-500 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          } ${imageLoaded ? "" : "hidden"}`}
+          onLoad={() => setImageLoaded(true)}
+          style={{ aspectRatio: 300 / 200 }}
+        />
         {discountPercentage && (
           <Badge className="absolute top-2 right-2">
             {discountPercentage}% OFF
