@@ -120,15 +120,16 @@ const ProductPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-40 my-8">
         <Card className="overflow-hidden">
           <CardContent className="p-0">
-            {imgLoaded ? (
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-auto object-cover"
-                style={{ aspectRatio: 1 }}
-                onLoad={handleImageLoad}
-              />
-            ) : (
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className={`w-full h-auto object-cover ${
+                imgLoaded ? "" : "hidden"
+              }`}
+              style={{ aspectRatio: 1 }}
+              onLoad={handleImageLoad}
+            />
+            {!imgLoaded && (
               <Skeleton className="w-full h-auto" style={{ aspectRatio: 1 }} />
             )}
           </CardContent>
