@@ -34,6 +34,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({
                   price={product.price}
                   discountPercentage={product.discountPercentage}
                   category={product.category}
+                  in_stock={product.in_stock}
                 />
               </div>
             ))}

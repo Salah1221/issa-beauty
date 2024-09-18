@@ -10,6 +10,7 @@ type ProductCardProps = {
   imageUrl: string;
   discountPercentage?: number;
   category: string;
+  in_stock?: boolean;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -19,6 +20,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   imageUrl,
   discountPercentage,
   category,
+  in_stock,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -62,18 +64,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           {name}
         </Link>
-        <div className="mt-2">
-          {discountedPrice ? (
-            <div className="flex items-center">
-              <span className="text-lg font-bold">
-                ${discountedPrice.toFixed(2)}
-              </span>
-              <span className="ml-2 text-sm line-through text-gray-500">
-                ${price.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <span className="text-lg font-bold">${price.toFixed(2)}</span>
+        <div className="mt-2 flex justify-between items-end w-full">
+          <div className="">
+            {discountedPrice ? (
+              <div className="flex items-center">
+                <span className="text-lg font-bold">
+                  ${discountedPrice.toFixed(2)}
+                </span>
+                <span className="ml-2 text-sm line-through text-gray-500">
+                  ${price.toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <span className="text-lg font-bold">${price.toFixed(2)}</span>
+            )}
+          </div>
+          {in_stock !== undefined && !in_stock && (
+            <Badge variant="destructive">Out of stock</Badge>
           )}
         </div>
       </CardFooter>

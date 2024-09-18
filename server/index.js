@@ -1,4 +1,4 @@
-import { Category, Product } from "./models.js";
+import { BannerImg, Category, Product } from "./models.js";
 import express from "express";
 import { connectDB } from "./db.js";
 import path from "path";
@@ -150,7 +150,17 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5173;
+app.get("/api/banner-images", async (req, res) => {
+  try {
+    const bannerImages = await BannerImg.find();
+
+    res.status(200).json({ success: true, data: bannerImages });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/dist")));

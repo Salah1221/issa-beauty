@@ -10,7 +10,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Autoplay from "embla-carousel-autoplay";
 import React, { useEffect, useState } from "react";
-import { HomeLoaderData, homeLoader } from "./utilities";
+import {
+  BannerImage,
+  HomeLoaderData,
+  bannerImagesLoader,
+  homeLoader,
+} from "./utilities";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -41,7 +46,7 @@ const AllProductsSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="my-12 border rounded-lg shadow-sm md:shadow-lg overflow-hidden">
+    <Card className="my-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 lg:py-12 flex items-center justify-between">
         <div>
           <h2 className="text-xl md:text-3xl font-bold text-foreground mb-2">
@@ -60,15 +65,17 @@ const AllProductsSection: React.FC = () => {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
-        <div className="hidden lg:block">
-          <img
-            src="/api/placeholder/300/200"
-            alt="Product collage"
-            className="rounded-lg shadow-md"
-          />
+        <div className="hidden lg:block relative">
+          <div className="absolute top-1/2 -translate-y-1/2 right-[-50px] w-[400px] aspect-square">
+            <img
+              src="src/assets/issa_beauty.png"
+              alt="Product collage"
+              className="rounded-lg"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -78,11 +85,16 @@ const Home: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
 
   useEffect(() => {
     homeLoader().then((data) => {
       setProductsByCategory(data);
       if (data) setIsLoading(false);
+    });
+
+    bannerImagesLoader().then((data) => {
+      setBannerImages(data);
     });
   }, []);
 
@@ -97,12 +109,16 @@ const Home: React.FC = () => {
         ]}
       >
         <CarouselContent>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {bannerImages.map((bannerImage, index) => (
             <CarouselItem className="w-full" key={index}>
               <div className="p-1">
-                <Card>
-                  <CardContent className="flex items-center justify-center p-6 aspect-video">
-                    <span className="text-4xl font-semibold">{index + 1}</span>
+                <Card className="overflow-hidden">
+                  <CardContent className="aspect-video p-0">
+                    <img
+                      src={bannerImage.imageUrl}
+                      alt=""
+                      className="object-cover w-full h-full"
+                    />
                   </CardContent>
                 </Card>
               </div>

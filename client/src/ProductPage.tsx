@@ -137,6 +137,11 @@ const ProductPage = () => {
         <div className="space-y-4 self-center">
           <h1 className="text-3xl md:text-5xl font-bold">{product.name}</h1>
           <Badge variant="secondary">{product.category}</Badge>
+          {product.in_stock !== undefined && !product.in_stock && (
+            <Badge className="ml-2" variant="destructive">
+              Out of stock
+            </Badge>
+          )}
           <p className="text-muted-foreground">{product.description}</p>
           <div className="text-2xl md:text-3xl font-bold">
             ${product.price.toFixed(2)}
@@ -150,10 +155,12 @@ const ProductPage = () => {
               </span>
             )}
           </div>
-          {product.discountPercentage && product.discountPercentage > 0 && (
+          {product.discountPercentage && product.discountPercentage > 0 ? (
             <Badge className="font-bold">
               {product.discountPercentage}% OFF
             </Badge>
+          ) : (
+            ""
           )}
           <div className="flex flex-wrap gap-2 mt-4">
             <Button onClick={handleCopyUrl} variant="outline">
@@ -205,8 +212,10 @@ const ProductPage = () => {
       {productsByCategory[`${product.category}`] ? (
         <ProductCategory
           title={`Similar Products`}
-          products={productsByCategory[`${product.category}`]}
-          onMoreClick={() => {}}
+          products={productsByCategory[`${product.category}`].filter(
+            (product) => product._id !== productId
+          )}
+          onMoreClick={() => navigate(`/products?category=${product.category}`)}
         />
       ) : (
         <SkeletonProductCategory />

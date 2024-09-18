@@ -53,9 +53,26 @@ const categorySchema = new Schema(
   }
 );
 
+const BannerImgSchema = new Schema(
+  {
+    imageUrl: {
+      type: String,
+      required: true,
+    },
+    imageFileId: {
+      type: String,
+      required: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 // Create models for Product and Category
 const Product = model("Product", productSchema);
 const Category = model("Category", categorySchema);
+const BannerImg = model("BannerImg", BannerImgSchema, "bannerImages");
 
 // Export the models
-export { Product, Category };
+export { Product, Category, BannerImg };

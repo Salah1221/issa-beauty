@@ -18,13 +18,14 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-center">
-                <Mail className="w-4 h-4 mr-2" /> info@example.com
+                <Mail className="w-4 h-4 mr-2" /> issa.beauty.inc@gmail.com
               </li>
               <li className="flex items-center">
-                <Phone className="w-4 h-4 mr-2" /> +1 (123) 456-7890
+                <Phone className="w-4 h-4 mr-2" /> +961 76 374 336
               </li>
               <li className="flex items-center">
-                <MapPin className="w-4 h-4 mr-2" /> 123 Main St, City, Country
+                <MapPin className="w-4 h-4 mr-2" /> Qobbeh near Najem's Shoes,
+                Tripoli, Lebanon
               </li>
             </ul>
           </div>
@@ -55,8 +56,10 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="#"
+              href="https://wa.me/+96176374336"
               className="text-muted-foreground hover:text-primary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <svg
                 role="img"

@@ -154,6 +154,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
                 imageUrl={product.imageUrl}
                 discountPercentage={product.discountPercentage}
                 category={product.category}
+                in_stock={product.in_stock}
               />
             ))
           : !loading &&
