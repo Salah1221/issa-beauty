@@ -4,6 +4,7 @@ import {
   RouterProvider,
   useNavigate,
   Outlet,
+  useLocation,
 } from "react-router-dom";
 import Home from "./Home";
 import Navbar from "./Navbar";
@@ -20,6 +21,13 @@ type LayoutProps = {
 // Layout component to wrap the Navbar and content
 const Layout: React.FC<LayoutProps> = ({ search, setSearch }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setSearch("");
+    }
+  }, [location.pathname, setSearch]);
 
   useEffect(() => {
     if (search) {
