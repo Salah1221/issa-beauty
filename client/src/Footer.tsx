@@ -37,7 +37,7 @@ const Footer = () => {
             reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0 social-links">
-            <a href="#">
+            <a href="https://tiktok.com/@mohamad.issa2323">
               <svg
                 height={24}
                 width={24}
