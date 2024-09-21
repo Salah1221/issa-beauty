@@ -112,3 +112,12 @@
     transform: rotate(360deg);
   }
 }
+
+.social-links {
+  a path {
+    transition: fill 0.3s;
+  }
+  a:hover path {
+    fill: hsl(var(--primary));
+  }
+}

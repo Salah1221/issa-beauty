@@ -36,11 +36,8 @@ const Footer = () => {
             &copy; {new Date(Date.now()).getFullYear()} Issa Beauty. All rights
             reserved.
           </p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <a
-              href="#"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
+          <div className="flex space-x-4 mt-4 md:mt-0 social-links">
+            <a href="#">
               <svg
                 height={24}
                 width={24}
@@ -57,7 +54,6 @@ const Footer = () => {
             </a>
             <a
               href="https://wa.me/+96176374336"
-              className="text-muted-foreground hover:text-primary transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -75,10 +71,7 @@ const Footer = () => {
                 />
               </svg>
             </a>
-            <a
-              href="#"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
+            <a href="https://www.instagram.com/issabeauty20?igsh=eW44YXpuZWtpNXQz">
               <svg
                 role="img"
                 viewBox="0 0 24 24"

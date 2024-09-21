@@ -136,7 +136,7 @@ const ProductPage = () => {
           <p className="text-muted-foreground">{product.description}</p>
           <div className="text-2xl md:text-3xl font-bold">
             ${product.price.toFixed(2)}
-            {product.discountPercentage && product.discountPercentage > 0 && (
+            {product.discountPercentage && product.discountPercentage > 0 ? (
               <span className="ml-2 text-sm line-through text-gray-500">
                 $
                 {(
@@ -144,6 +144,8 @@ const ProductPage = () => {
                   (1 - product.discountPercentage / 100)
                 ).toFixed(2)}
               </span>
+            ) : (
+              ""
             )}
           </div>
           {product.discountPercentage && product.discountPercentage > 0 ? (
@@ -180,7 +182,7 @@ const ProductPage = () => {
                   fill="hsl(var(--foreground))"
                 />
               </svg>
-              Share on WhatsApp
+              Share on WhatsApp {false}
             </Button>
           </div>
         </div>
