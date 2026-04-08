@@ -57,7 +57,7 @@ jobs:
             cd /var/www/issa-beauty
 
             # Install only backend dependencies on the actual server
-            /root/.local/share/pnpm/pnpm install --prod
+            pnpm install --prod
 
             # Restart or start PM2
             pm2 restart issa-beauty --update-env || NODE_ENV=production pm2 start server/index.js --name "issa-beauty"
