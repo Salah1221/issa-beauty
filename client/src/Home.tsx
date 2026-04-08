@@ -81,7 +81,7 @@ const AllProductsSection: React.FC = () => {
 
 const Home: React.FC = () => {
   const [productsByCategory, setProductsByCategory] = useState<HomeLoaderData>(
-    {}
+    {},
   );
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -100,38 +100,40 @@ const Home: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <Carousel
-        className="w-full mt-8 aspect-video"
-        plugins={[
-          Autoplay({
-            delay: 2000,
-          }),
-        ]}
-      >
-        <CarouselContent>
-          {bannerImages.map((bannerImage, index) => (
-            <CarouselItem className="w-full" key={index}>
-              <div className="p-1">
-                <Card className="overflow-hidden">
-                  <CardContent className="aspect-video p-0">
-                    <img
-                      src={bannerImage.imageUrl}
-                      alt=""
-                      className="object-cover w-full h-full"
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="absolute top-1/2 -translate-y-1/2 left-20 hidden sm:block">
-          <CarouselPrevious />
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-20 hidden sm:block">
-          <CarouselNext />
-        </div>
-      </Carousel>
+      {bannerImages?.length > 0 && (
+        <Carousel
+          className="w-full mt-8 aspect-video"
+          plugins={[
+            Autoplay({
+              delay: 2000,
+            }),
+          ]}
+        >
+          <CarouselContent>
+            {bannerImages.map((bannerImage, index) => (
+              <CarouselItem className="w-full" key={index}>
+                <div className="p-1">
+                  <Card className="overflow-hidden">
+                    <CardContent className="aspect-video p-0">
+                      <img
+                        src={bannerImage.imageUrl}
+                        alt=""
+                        className="object-cover w-full h-full"
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="absolute top-1/2 -translate-y-1/2 left-20 hidden sm:block">
+            <CarouselPrevious />
+          </div>
+          <div className="absolute top-1/2 -translate-y-1/2 right-20 hidden sm:block">
+            <CarouselNext />
+          </div>
+        </Carousel>
+      )}
       <AllProductsSection />
       {isLoading ? (
         <>
