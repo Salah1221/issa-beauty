@@ -38,13 +38,25 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
   const [sortOrder, setSortOrder] = useState<string>("newest");
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const location = useLocation();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchProducts = useCallback(
     async (page: number) => {
       const fetchId = ++fetchIdRef.current;
       setLoading(true);
+      
+      // Abort previous request if it exists
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      
+      // Create a new controller for this request
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       try {
         const response = await axios.get(`/api/products`, {
+          signal: controller.signal,
           params: {
             page,
             limit: 12,
@@ -63,9 +75,16 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
           setTotalPages(data.pages);
         }
       } catch (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-        setPage(1);
+        if (axios.isCancel(error)) {
+          console.log("Request canceled:", error.message);
+        } else {
+          console.error("Error fetching products:", error);
+          if (fetchId === fetchIdRef.current) {
+            setProducts([]);
+            setPage(1);
+            setLoading(false);
+          }
+        }
       }
     },
     [search, category, sortOrder],

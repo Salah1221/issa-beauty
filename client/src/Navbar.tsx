@@ -15,6 +15,21 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
+  const [localSearch, setLocalSearch] = useState(search);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== search) {
+        setSearch(localSearch);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [localSearch, search, setSearch]);
+
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
 
   useEffect(() => {
     setMounted(true);
@@ -90,8 +105,8 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
                   placeholder="Search..."
                   className="pl-10 w-full"
                   name="search"
-                  defaultValue={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
                 />
               </div>
             </div>
@@ -126,14 +141,14 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
               <SheetContent side="top" className="h-32">
                 <div className="h-full flex items-center">
                   <Input
-                    id="search"
+                    id="search-mobile"
                     type="search"
                     placeholder="Search..."
                     className="w-full"
                     autoFocus
                     name="search"
-                    defaultValue={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={localSearch}
+                    onChange={(e) => setLocalSearch(e.target.value)}
                     onKeyDown={handleKeyDown}
                   />
                 </div>

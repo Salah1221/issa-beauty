@@ -47,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ search, setSearch }) => {
 function App() {
   const [search, setSearch] = useState("");
 
-  const router = createBrowserRouter([
+  const router = React.useMemo(() => createBrowserRouter([
     {
       path: "/",
       element: <Layout search={search} setSearch={setSearch} />,
@@ -67,7 +67,7 @@ function App() {
         },
       ],
     },
-  ]);
+  ]), [search]);
 
   return <RouterProvider router={router} />;
 }
