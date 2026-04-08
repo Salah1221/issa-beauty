@@ -42,6 +42,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <img
           src={imageUrl}
           alt={name}
+          loading="lazy"
           className={`h-[200px] w-full object-cover transition-opacity duration-500 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           } ${imageLoaded ? "" : "hidden"}`}
