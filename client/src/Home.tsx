@@ -19,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import { ArrowRight } from "lucide-react";
+import issaBeautyImg from "./assets/issa_beauty.png";
 
 export const SkeletonProductCategory = () => (
   <div className="my-8">
@@ -68,7 +69,7 @@ const AllProductsSection: React.FC = () => {
         <div className="hidden lg:block relative">
           <div className="absolute top-1/2 -translate-y-1/2 right-[-50px] w-[400px] aspect-square">
             <img
-              src="src/assets/issa_beauty.png"
+              src={issaBeautyImg}
               alt="Product collage"
               className="rounded-lg"
             />
