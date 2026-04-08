@@ -58,7 +58,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
         if (fetchId === fetchIdRef.current) {
           setLoading(false);
           setProducts((prevProducts) =>
-            page === 1 ? data.data : [...prevProducts, ...data.data]
+            page === 1 ? data.data : [...prevProducts, ...data.data],
           );
           setTotalPages(data.pages);
         }
@@ -68,7 +68,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
         setPage(1);
       }
     },
-    [search, category, sortOrder]
+    [search, category, sortOrder],
   );
 
   useEffect(() => {
@@ -117,9 +117,9 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid">
       <h1 className="text-2xl font-bold my-8">Our Products</h1>
 
-      <div className="flex justify-between mb-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
@@ -133,7 +133,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
         </Select>
 
         <Select value={sortOrder} onValueChange={setSortOrder}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
