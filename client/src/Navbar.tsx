@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Moon, Sun } from "lucide-react";
@@ -131,29 +130,42 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
 
           {/* Search button for mobile */}
           <div className="md:hidden ml-2">
-            <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Search className="h-5 w-5" />
-                  <span className="sr-only">Open search</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="top" className="h-32">
-                <div className="h-full flex items-center">
-                  <Input
-                    id="search-mobile"
-                    type="search"
-                    placeholder="Search..."
-                    className="w-full"
-                    autoFocus
-                    name="search"
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
+              {isSearchOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Search className="h-5 w-5" />
+              )}
+              <span className="sr-only">Toggle search</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Expandable Search Bar */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isSearchOpen ? "max-h-20 opacity-100 pb-4" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="relative mt-2">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            </div>
+            <Input
+              id="search-mobile"
+              type="search"
+              placeholder="Search..."
+              className="pl-10 w-full"
+              autoFocus={isSearchOpen}
+              name="search"
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
           </div>
         </div>
       </div>
