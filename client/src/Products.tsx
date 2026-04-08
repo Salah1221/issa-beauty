@@ -72,40 +72,57 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
   );
 
   useEffect(() => {
+    const controller = new AbortController();
+    
+    axios.get("/api/categories", { signal: controller.signal })
+      .then((response) => {
+        const data = response.data;
+        if (data.success) {
+          setAllCategories(data.data);
+        }
+      })
+      .catch((error) => {
+        if (!axios.isCancel(error)) {
+          console.error("Error fetching categories:", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
     setProducts([]);
     setPage(1);
-    fetchProducts(1);
-  }, [fetchProducts, search, category, sortOrder]);
+    // Don't call fetchProducts(1) here, let the page useEffect handle it
+  }, [search, category, sortOrder]);
 
   useEffect(() => {
     fetchProducts(page);
   }, [page, fetchProducts]);
 
+  const loaderRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    axios.get("/api/categories").then((response) => {
-      const data = response.data;
-      if (data.success) {
-        setAllCategories(data.data);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && page < totalPages) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      },
+      { rootMargin: "100px" }
+    );
+    
+    const currentLoader = loaderRef.current;
+    if (currentLoader) {
+      observer.observe(currentLoader);
+    }
+    
+    return () => {
+      if (currentLoader) {
+        observer.unobserve(currentLoader);
       }
-    });
-  }, [allCategories]);
-
-  const handleScroll = useCallback(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !==
-      document.documentElement.offsetHeight
-    ) {
-      return;
-    }
-    if (page < totalPages) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  }, [page, totalPages]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    };
+  }, [loading, page, totalPages]);
 
   useEffect(() => {
     const category =
@@ -176,6 +193,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
           Load More
         </Button>
       )}
+      <div ref={loaderRef} className="h-1" />
     </div>
   );
 };
