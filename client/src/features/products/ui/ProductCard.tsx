@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, CardFooter } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
 import { Link } from "react-router-dom";
@@ -23,6 +23,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   in_stock,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // A cached image can finish loading before React attaches onLoad, so the
+  // event never fires. Reconcile against the element's actual state on mount.
+  useEffect(() => {
+    if (imgRef.current?.complete) setImageLoaded(true);
+  }, []);
 
   if (discountPercentage === 0) discountPercentage = undefined;
   const discountedPrice =
@@ -32,20 +39,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Card className="sm:max-w-[300px] overflow-hidden w-full sm:w-auto">
-      <div className="relative">
+      <div className="relative h-[200px] w-full">
         {!imageLoaded && (
-          <div
-            className="animate-pulse bg-muted h-[200px] w-full"
-            style={{ aspectRatio: 300 / 200 }}
-          ></div>
+          <div className="animate-pulse bg-muted absolute inset-0"></div>
         )}
         <img
+          ref={imgRef}
           src={imageUrl}
           alt={name}
           loading="lazy"
           className={`h-[200px] w-full object-cover transition-opacity duration-500 ${
             imageLoaded ? "opacity-100" : "opacity-0"
-          } ${imageLoaded ? "" : "hidden"}`}
+          }`}
           onLoad={() => setImageLoaded(true)}
           style={{ aspectRatio: 300 / 200 }}
         />

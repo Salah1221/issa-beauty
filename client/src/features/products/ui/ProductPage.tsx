@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Product,
@@ -23,6 +23,14 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [urlCopied, setUrlCopied] = useState(false);
   const navigate = useNavigate();
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // A cached image can finish loading before React attaches onLoad, so the
+  // event never fires. Reconcile against the element's actual state whenever
+  // the displayed image changes.
+  useEffect(() => {
+    setImgLoaded(imgRef.current?.complete ?? false);
+  }, [product?.imageUrl]);
 
   const fetchProduct = useCallback(async () => {
     if (!productId) return;
@@ -115,19 +123,17 @@ const ProductPage = () => {
       </Button>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-40 my-8">
         <Card className="overflow-hidden">
-          <CardContent className="p-0">
+          <CardContent className="relative aspect-square p-0">
             <img
+              ref={imgRef}
               src={product.imageUrl}
               alt={product.name}
-              className={`w-full h-auto object-cover ${
-                imgLoaded ? "" : "hidden"
+              className={`h-full w-full object-cover transition-opacity duration-500 ${
+                imgLoaded ? "opacity-100" : "opacity-0"
               }`}
-              style={{ aspectRatio: 1 }}
               onLoad={handleImageLoad}
             />
-            {!imgLoaded && (
-              <Skeleton className="w-full h-auto" style={{ aspectRatio: 1 }} />
-            )}
+            {!imgLoaded && <Skeleton className="absolute inset-0 h-full w-full" />}
           </CardContent>
         </Card>
         <div className="space-y-4 self-center">
