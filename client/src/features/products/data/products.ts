@@ -35,6 +35,13 @@ export type ProductQuery = {
   search?: string;
   category?: string;
   sort?: string;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+export type PriceRange = {
+  min: number;
+  max: number;
 };
 
 export const getProductsByCategory = (
@@ -51,6 +58,28 @@ export const getCategories = (
   signal?: AbortSignal,
 ): Promise<ApiResult<Category[]>> =>
   request<Category[]>({ url: "/api/categories", signal });
+
+export const getPriceRange = (
+  params: { search?: string; category?: string },
+  signal?: AbortSignal,
+): Promise<ApiResult<PriceRange>> =>
+  request<PriceRange>(
+    {
+      url: "/api/products-price-range",
+      signal,
+      params: {
+        search: params.search || undefined,
+        category:
+          params.category && params.category !== "all"
+            ? params.category
+            : undefined,
+      },
+    },
+    (body) => ({
+      min: (body.min as number) ?? 0,
+      max: (body.max as number) ?? 0,
+    }),
+  );
 
 export const getProduct = (
   id: string,
@@ -75,6 +104,8 @@ export const getProducts = (
             ? query.category
             : undefined,
         sort: query.sort,
+        minPrice: query.minPrice,
+        maxPrice: query.maxPrice,
       },
     },
     (body) => ({

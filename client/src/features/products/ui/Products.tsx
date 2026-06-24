@@ -1,7 +1,9 @@
 import {
   Category,
+  PriceRange,
   Product,
   getCategories,
+  getPriceRange,
   getProducts,
 } from "@/features/products/data/products";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -16,6 +18,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/common/ui/components/select";
+import { Badge } from "@/common/ui/components/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/common/ui/components/sheet";
+import { Slider } from "@/common/ui/components/slider";
+import { SlidersHorizontal } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 type ProductsProps = {
@@ -40,6 +52,13 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
   const fetchIdRef = useRef(0);
   const [category, setCategory] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("newest");
+  // Slider bounds come from the catalog so the control auto-scales to real prices.
+  const [priceBounds, setPriceBounds] = useState<PriceRange | null>(null);
+  // Live slider position (drives the labels); committed value drives the fetch.
+  const [priceValue, setPriceValue] = useState<[number, number]>([0, 0]);
+  const [appliedPrice, setAppliedPrice] = useState<[number, number] | null>(
+    null,
+  );
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const location = useLocation();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -59,7 +78,14 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
       abortControllerRef.current = controller;
 
       const result = await getProducts(
-        { page, search, category, sort: sortOrder },
+        {
+          page,
+          search,
+          category,
+          sort: sortOrder,
+          minPrice: appliedPrice?.[0],
+          maxPrice: appliedPrice?.[1],
+        },
         controller.signal,
       );
 
@@ -84,7 +110,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
       );
       setTotalPages(result.data.pages);
     },
-    [search, category, sortOrder],
+    [search, category, sortOrder, appliedPrice],
   );
 
   useEffect(() => {
@@ -99,11 +125,32 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
     return () => controller.abort();
   }, []);
 
+  // Load slider bounds for the current search + category and clear any applied
+  // price filter so it never carries over to a different result set.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getPriceRange({ search, category }, controller.signal).then((result) => {
+      if (result.type === "success") {
+        const min = Math.floor(result.data.min);
+        const max = Math.ceil(result.data.max);
+        setPriceBounds({ min, max });
+        setPriceValue([min, max]);
+      } else if (result.type === "error") {
+        console.error("Error fetching price range:", result.message);
+      }
+    });
+
+    setAppliedPrice(null);
+
+    return () => controller.abort();
+  }, [search, category]);
+
   useEffect(() => {
     setProducts([]);
     setPage(1);
     // Don't call fetchProducts(1) here, let the page useEffect handle it
-  }, [search, category, sortOrder]);
+  }, [search, category, sortOrder, appliedPrice]);
 
   useEffect(() => {
     fetchProducts(page);
@@ -139,34 +186,106 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
     setCategory(category);
   }, [location.search]);
 
+  // Filters considered "active" for the mobile badge (sort is excluded).
+  const activeFilterCount =
+    (category !== "all" ? 1 : 0) + (appliedPrice ? 1 : 0);
+
+  const priceSpan = priceBounds ? priceBounds.max - priceBounds.min : 0;
+  const priceStep = priceSpan <= 10 ? 0.5 : priceSpan <= 100 ? 1 : 5;
+  const priceDisabled = !priceBounds || priceBounds.min >= priceBounds.max;
+
+  // Shared between the desktop toolbar and the mobile filter sheet so both stay
+  // in sync. Responsive widths only kick in inside the desktop (sm+) toolbar;
+  // inside the mobile sheet the base full-width classes apply.
+  const filterFields = (
+    <>
+      <Select value={category} onValueChange={setCategory}>
+        <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Categories</SelectItem>
+          {allCategories.map((category, i) => (
+            <SelectItem key={i} value={category.name}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <div className="w-full sm:w-[240px] space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Price</span>
+          <span className="font-medium tabular-nums">
+            {priceBounds
+              ? `$${priceValue[0].toFixed(2)} – $${priceValue[1].toFixed(2)}`
+              : "—"}
+          </span>
+        </div>
+        <Slider
+          min={priceBounds?.min ?? 0}
+          max={priceBounds?.max ?? 0}
+          step={priceStep}
+          value={priceValue}
+          onValueChange={(v) => setPriceValue(v as [number, number])}
+          onValueCommit={(v) => {
+            const next = v as [number, number];
+            const isFullRange =
+              !priceBounds ||
+              (next[0] <= priceBounds.min && next[1] >= priceBounds.max);
+            setAppliedPrice(isFullRange ? null : next);
+          }}
+          disabled={priceDisabled}
+          aria-label="Filter by price range"
+        />
+      </div>
+
+      <Select value={sortOrder} onValueChange={setSortOrder}>
+        <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectValue placeholder="Sort by" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="newest">Newest First</SelectItem>
+          <SelectItem value="oldest">Oldest First</SelectItem>
+          <SelectItem value="price-asc">Price: Low to High</SelectItem>
+          <SelectItem value="price-desc">Price: High to Low</SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid">
       <h1 className="text-2xl font-bold my-8">Our Products</h1>
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {allCategories.map((category, i) => (
-              <SelectItem key={i} value={category.name}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Desktop: inline filter toolbar */}
+      <div className="hidden sm:flex flex-wrap items-end gap-4 mb-6">
+        {filterFields}
+      </div>
 
-        <Select value={sortOrder} onValueChange={setSortOrder}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Mobile: collapse filters behind a sheet to keep the toolbar tidy */}
+      <div className="sm:hidden mb-6">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="w-full justify-between">
+              <span className="flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters &amp; Sort
+              </span>
+              {activeFilterCount > 0 && (
+                <Badge className="ml-2">{activeFilterCount}</Badge>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="rounded-t-xl">
+            <SheetHeader className="mb-4">
+              <SheetTitle>Filters &amp; Sort</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-5 pb-2">
+              {filterFields}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
