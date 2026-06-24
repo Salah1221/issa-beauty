@@ -15,15 +15,16 @@ const ErrorPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <Card className="p-8 max-w-md w-full text-center">
-        <AlertTriangle className="mx-auto text-red-500 mb-4" size={64} />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+          <AlertTriangle className="text-destructive" size={36} />
+        </div>
         <h1 className="text-4xl font-bold mb-2">Oops!</h1>
-        <p className="text-xl mb-4">Looks like an unexpected error occurred</p>
-        <div
-          className="bg-red-400 border border-red-400 text-red-400 px-4 py-3 rounded mb-4"
-          style={{ "--tw-bg-opacity": 0.3 } as React.CSSProperties}
-        >
-          <p className="font-medium">Error details:</p>
-          <p className="italic">
+        <p className="text-xl text-muted-foreground mb-4">
+          Looks like an unexpected error occurred
+        </p>
+        <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-md mb-6 text-left">
+          <p className="font-medium">Error details</p>
+          <p className="italic break-words">
             {error.statusText || error.message || "Unknown error"}
           </p>
         </div>
