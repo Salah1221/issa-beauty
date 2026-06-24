@@ -5,9 +5,9 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/common/ui/components/carousel";
+import { Card, CardContent, CardFooter } from "@/common/ui/components/card";
+import { Skeleton } from "@/common/ui/components/skeleton";
 import Autoplay from "embla-carousel-autoplay";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,11 +15,11 @@ import {
   HomeLoaderData,
   bannerImagesLoader,
   homeLoader,
-} from "./utilities";
+} from "@/features/products/data/products";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./components/ui/button";
+import { Button } from "@/common/ui/components/button";
 import { ArrowRight } from "lucide-react";
-import issaBeautyImg from "./assets/issa_beauty.png";
+import issaBeautyImg from "@/assets/issa_beauty.png";
 
 export const SkeletonProductCategory = () => (
   <div className="my-8">

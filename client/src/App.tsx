@@ -6,12 +6,12 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom";
-import Home from "./Home";
-import Navbar from "./Navbar";
-import ErrorPage from "./ErrorPage";
-import Products from "./Products";
-import Footer from "./Footer";
-import ProductPage from "./ProductPage";
+import Home from "@/features/products/ui/Home";
+import Navbar from "@/layout/ui/Navbar";
+import ErrorPage from "@/layout/ui/ErrorPage";
+import Products from "@/features/products/ui/Products";
+import Footer from "@/layout/ui/Footer";
+import ProductPage from "@/features/products/ui/ProductPage";
 
 type LayoutProps = {
   search: string;

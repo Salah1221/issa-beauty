@@ -1,7 +1,7 @@
 import { useRouteError, Link } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "./components/ui/card";
+import { Button } from "@/common/ui/components/button";
+import { Card } from "@/common/ui/components/card";
 
 interface RouteError {
   status?: number;

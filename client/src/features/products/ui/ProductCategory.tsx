@@ -1,7 +1,7 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/common/ui/components/button";
 import ProductCard from "./ProductCard";
-import { Product } from "./utilities";
+import { Product } from "@/features/products/data/products";
 
 type ProductCategoryProps = {
   title: string;

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { homeLoader, HomeLoaderData, Product } from "./utilities";
+import { homeLoader, HomeLoaderData, Product } from "@/features/products/data/products";
 import axios from "axios";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/common/ui/components/card";
+import { Badge } from "@/common/ui/components/badge";
+import { Skeleton } from "@/common/ui/components/skeleton";
+import { Button } from "@/common/ui/components/button";
 import { Copy, ArrowLeft, CircleCheck } from "lucide-react";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";

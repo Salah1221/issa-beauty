@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Card, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardFooter } from "@/common/ui/components/card";
+import { Badge } from "@/common/ui/components/badge";
 import { Link } from "react-router-dom";
 
 type ProductCardProps = {
