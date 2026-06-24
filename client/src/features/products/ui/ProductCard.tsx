@@ -38,8 +38,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
       : null;
 
   return (
-    <Card className="sm:max-w-[300px] overflow-hidden w-full sm:w-auto">
-      <div className="relative h-[200px] w-full">
+    <Card className="group relative flex h-full w-full flex-col overflow-hidden transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      <div className="relative h-[200px] w-full overflow-hidden bg-muted">
         {!imageLoaded && (
           <div className="animate-pulse bg-muted absolute inset-0"></div>
         )}
@@ -48,29 +48,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
           src={imageUrl}
           alt={name}
           loading="lazy"
-          className={`h-[200px] w-full object-cover transition-opacity duration-500 ${
+          className={`h-[200px] w-full object-cover transition-all duration-500 group-hover:scale-105 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setImageLoaded(true)}
           style={{ aspectRatio: 300 / 200 }}
         />
         {discountPercentage && (
-          <Badge className="absolute top-2 right-2">
+          <Badge className="absolute top-2 right-2 shadow-sm">
             {discountPercentage}% OFF
           </Badge>
         )}
-        <Badge className="absolute top-2 left-2 bg-background text-foreground">
+        <Badge className="absolute top-2 left-2 border-border bg-background/85 text-foreground shadow-sm backdrop-blur-sm">
           {category}
         </Badge>
       </div>
-      <CardFooter className="p-4 flex flex-col items-start">
+      <CardFooter className="flex w-full flex-1 flex-col items-start p-4">
         <Link
           to={`/products/${id}`}
-          className="text-lg font-semibold hover:text-primary hover:underline transition-all duration-200"
+          className="text-lg font-semibold transition-colors duration-200 outline-none after:absolute after:inset-0 after:rounded-xl group-hover:text-primary"
         >
-          {name}
+          <span className="line-clamp-2">{name}</span>
         </Link>
-        <div className="mt-2 flex justify-between items-end w-full">
+        <div className="mt-auto flex w-full items-end justify-between pt-3">
           <div className="">
             {discountedPrice ? (
               <div className="flex items-center">

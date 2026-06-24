@@ -27,11 +27,11 @@ export const SkeletonProductCategory = () => (
     <div className="relative">
       <div className="flex overflow-x-auto space-x-4 pb-4">
         {Array.from({ length: 8 }).map((_, index) => (
-          <Card key={index} className="flex-shrink-0">
-            <Skeleton
-              className="w-full h-[200px] mb-4 rounded-b-none"
-              style={{ aspectRatio: 300 / 200 }}
-            />
+          <Card
+            key={index}
+            className="flex-shrink-0 w-[260px] sm:w-[280px] overflow-hidden"
+          >
+            <Skeleton className="w-full h-[200px] mb-4 rounded-none" />
             <CardFooter className="p-4 flex flex-col items-start">
               <Skeleton className="h-4 w-3/4 mb-4" />
               <Skeleton className="h-4 w-1/2" />

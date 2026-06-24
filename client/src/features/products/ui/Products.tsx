@@ -23,8 +23,8 @@ type ProductsProps = {
 };
 
 const ProductSkeleton = () => (
-  <Card className="space-y-4">
-    <Skeleton className="h-48 w-full rounded-b-none" />
+  <Card className="h-full space-y-4 overflow-hidden">
+    <Skeleton className="h-[200px] w-full rounded-none" />
     <CardFooter className="p-4 flex flex-col items-start">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-4 w-1/2 mt-4" />
