@@ -1,4 +1,5 @@
-import axios from "axios";
+import { request } from "@/common/data/ApiClient";
+import { ApiResult } from "@/common/data/ApiResult";
 
 export type Product = {
   _id: string;
@@ -19,27 +20,65 @@ export type BannerImage = {
   imageUrl: string;
 };
 
-export type HomeLoaderData = {
+export type ProductsByCategory = {
   [category: string]: Product[];
 };
 
-export const homeLoader = async (): Promise<HomeLoaderData> => {
-  try {
-    const response = await axios.get("/api/products-by-category");
-    return response.data.data;
-  } catch (error) {
-    console.error("Error fetching products by category:", error);
-    return {};
-  }
+export type ProductsPage = {
+  products: Product[];
+  pages: number;
 };
 
-export const bannerImagesLoader = async (): Promise<BannerImage[]> => {
-  try {
-    const response = await axios.get("/api/banner-images");
-    if (response.data.success) return response.data.data;
-    else throw new Error("Error fetching banner images!!!!!!!!!");
-  } catch (error) {
-    console.error("Error fetching banner images:", error);
-    return [];
-  }
+export type ProductQuery = {
+  page: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  sort?: string;
 };
+
+export const getProductsByCategory = (
+  signal?: AbortSignal,
+): Promise<ApiResult<ProductsByCategory>> =>
+  request<ProductsByCategory>({ url: "/api/products-by-category", signal });
+
+export const getBannerImages = (
+  signal?: AbortSignal,
+): Promise<ApiResult<BannerImage[]>> =>
+  request<BannerImage[]>({ url: "/api/banner-images", signal });
+
+export const getCategories = (
+  signal?: AbortSignal,
+): Promise<ApiResult<Category[]>> =>
+  request<Category[]>({ url: "/api/categories", signal });
+
+export const getProduct = (
+  id: string,
+  signal?: AbortSignal,
+): Promise<ApiResult<Product>> =>
+  request<Product>({ url: `/api/products/${id}`, signal });
+
+export const getProducts = (
+  query: ProductQuery,
+  signal?: AbortSignal,
+): Promise<ApiResult<ProductsPage>> =>
+  request<ProductsPage>(
+    {
+      url: "/api/products",
+      signal,
+      params: {
+        page: query.page,
+        limit: query.limit ?? 12,
+        search: query.search || undefined,
+        category:
+          query.category && query.category !== "all"
+            ? query.category
+            : undefined,
+        sort: query.sort,
+      },
+    },
+    (body) => ({
+      products: (body.data as Product[]) ?? [],
+      pages: (body.pages as number) ?? 1,
+    }),
+  );

@@ -12,9 +12,9 @@ import Autoplay from "embla-carousel-autoplay";
 import React, { useEffect, useState } from "react";
 import {
   BannerImage,
-  HomeLoaderData,
-  bannerImagesLoader,
-  homeLoader,
+  ProductsByCategory,
+  getBannerImages,
+  getProductsByCategory,
 } from "@/features/products/data/products";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
@@ -81,22 +81,25 @@ const AllProductsSection: React.FC = () => {
 };
 
 const Home: React.FC = () => {
-  const [productsByCategory, setProductsByCategory] = useState<HomeLoaderData>(
-    {},
-  );
+  const [productsByCategory, setProductsByCategory] =
+    useState<ProductsByCategory>({});
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
 
   useEffect(() => {
-    homeLoader().then((data) => {
-      setProductsByCategory(data);
-      if (data) setIsLoading(false);
+    const controller = new AbortController();
+
+    getProductsByCategory(controller.signal).then((result) => {
+      if (result.type === "success") setProductsByCategory(result.data);
+      if (result.type !== "canceled") setIsLoading(false);
     });
 
-    bannerImagesLoader().then((data) => {
-      setBannerImages(data);
+    getBannerImages(controller.signal).then((result) => {
+      if (result.type === "success") setBannerImages(result.data);
     });
+
+    return () => controller.abort();
   }, []);
 
   return (

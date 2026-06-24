@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { homeLoader, HomeLoaderData, Product } from "@/features/products/data/products";
-import axios from "axios";
+import {
+  Product,
+  ProductsByCategory,
+  getProduct,
+  getProductsByCategory,
+} from "@/features/products/data/products";
 import { Card, CardContent } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
 import { Skeleton } from "@/common/ui/components/skeleton";
@@ -13,26 +17,21 @@ import { SkeletonProductCategory } from "./Home";
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [productsByCategory, setProductsByCategory] = useState<HomeLoaderData>(
-    {},
-  );
+  const [productsByCategory, setProductsByCategory] =
+    useState<ProductsByCategory>({});
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [urlCopied, setUrlCopied] = useState(false);
   const navigate = useNavigate();
 
   const fetchProduct = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`/api/products/${productId}`);
-      const data = response.data;
-      if (!data.success) throw new Error("Error in server");
-      setProduct(data.data);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    } finally {
-      setLoading(false);
-    }
+    if (!productId) return;
+    setLoading(true);
+    const result = await getProduct(productId);
+    if (result.type === "success") setProduct(result.data);
+    else if (result.type === "error")
+      console.error("Error fetching product:", result.message);
+    setLoading(false);
   }, [productId]);
 
   useEffect(() => {
@@ -42,10 +41,14 @@ const ProductPage = () => {
   }, [productId, fetchProduct]);
 
   useEffect(() => {
-    homeLoader().then((data) => {
-      setProductsByCategory(data);
+    const controller = new AbortController();
+
+    getProductsByCategory(controller.signal).then((result) => {
+      if (result.type === "success") setProductsByCategory(result.data);
     });
-  });
+
+    return () => controller.abort();
+  }, []);
 
   const handleWhatsAppContact = () => {
     const message = encodeURIComponent(
