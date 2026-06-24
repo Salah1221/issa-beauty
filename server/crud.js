@@ -1,4 +1,4 @@
-import { Product, Category } from "./models.js";
+import { Product, Category } from "./models/models.js";
 
 // CRUD operations for Product
 

@@ -1,4 +1,4 @@
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/common/ui/components/separator";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {

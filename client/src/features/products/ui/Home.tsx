@@ -5,21 +5,21 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/common/ui/components/carousel";
+import { Card, CardContent, CardFooter } from "@/common/ui/components/card";
+import { Skeleton } from "@/common/ui/components/skeleton";
 import Autoplay from "embla-carousel-autoplay";
 import React, { useEffect, useState } from "react";
 import {
   BannerImage,
-  HomeLoaderData,
-  bannerImagesLoader,
-  homeLoader,
-} from "./utilities";
+  ProductsByCategory,
+  getBannerImages,
+  getProductsByCategory,
+} from "@/features/products/data/products";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./components/ui/button";
+import { Button } from "@/common/ui/components/button";
 import { ArrowRight } from "lucide-react";
-import issaBeautyImg from "./assets/issa_beauty.png";
+import issaBeautyImg from "@/assets/issa_beauty.png";
 
 export const SkeletonProductCategory = () => (
   <div className="my-8">
@@ -81,22 +81,25 @@ const AllProductsSection: React.FC = () => {
 };
 
 const Home: React.FC = () => {
-  const [productsByCategory, setProductsByCategory] = useState<HomeLoaderData>(
-    {},
-  );
+  const [productsByCategory, setProductsByCategory] =
+    useState<ProductsByCategory>({});
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
 
   useEffect(() => {
-    homeLoader().then((data) => {
-      setProductsByCategory(data);
-      if (data) setIsLoading(false);
+    const controller = new AbortController();
+
+    getProductsByCategory(controller.signal).then((result) => {
+      if (result.type === "success") setProductsByCategory(result.data);
+      if (result.type !== "canceled") setIsLoading(false);
     });
 
-    bannerImagesLoader().then((data) => {
-      setBannerImages(data);
+    getBannerImages(controller.signal).then((result) => {
+      if (result.type === "success") setBannerImages(result.data);
     });
+
+    return () => controller.abort();
   }, []);
 
   return (

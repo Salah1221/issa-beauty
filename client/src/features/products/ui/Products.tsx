@@ -1,17 +1,21 @@
-import { Category, Product } from "./utilities";
+import {
+  Category,
+  Product,
+  getCategories,
+  getProducts,
+} from "@/features/products/data/products";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ProductCard from "./ProductCard";
-import axios from "axios";
-import { Button } from "./components/ui/button";
-import { Skeleton } from "./components/ui/skeleton";
-import { Card, CardFooter } from "./components/ui/card";
+import { Button } from "@/common/ui/components/button";
+import { Skeleton } from "@/common/ui/components/skeleton";
+import { Card, CardFooter } from "@/common/ui/components/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./components/ui/select";
+} from "@/common/ui/components/select";
 import { useLocation } from "react-router-dom";
 
 type ProductsProps = {
@@ -44,67 +48,53 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
     async (page: number) => {
       const fetchId = ++fetchIdRef.current;
       setLoading(true);
-      
+
       // Abort previous request if it exists
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      
+
       // Create a new controller for this request
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      try {
-        const response = await axios.get(`/api/products`, {
-          signal: controller.signal,
-          params: {
-            page,
-            limit: 12,
-            search: search || undefined,
-            category: category !== "all" ? category : undefined,
-            sort: sortOrder,
-          },
-        });
-        const data = response.data;
-        if (!data.success) throw new Error("Error in server");
-        if (fetchId === fetchIdRef.current) {
-          setLoading(false);
-          setProducts((prevProducts) =>
-            page === 1 ? data.data : [...prevProducts, ...data.data],
-          );
-          setTotalPages(data.pages);
-        }
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled:", error.message);
-        } else {
-          console.error("Error fetching products:", error);
-          if (fetchId === fetchIdRef.current) {
-            setProducts([]);
-            setPage(1);
-            setLoading(false);
-          }
-        }
+      const result = await getProducts(
+        { page, search, category, sort: sortOrder },
+        controller.signal,
+      );
+
+      // Ignore superseded or aborted requests.
+      if (result.type === "canceled" || fetchId !== fetchIdRef.current) {
+        return;
       }
+
+      if (result.type === "error") {
+        console.error("Error fetching products:", result.message);
+        setProducts([]);
+        setPage(1);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      setProducts((prevProducts) =>
+        page === 1
+          ? result.data.products
+          : [...prevProducts, ...result.data.products],
+      );
+      setTotalPages(result.data.pages);
     },
     [search, category, sortOrder],
   );
 
   useEffect(() => {
     const controller = new AbortController();
-    
-    axios.get("/api/categories", { signal: controller.signal })
-      .then((response) => {
-        const data = response.data;
-        if (data.success) {
-          setAllCategories(data.data);
-        }
-      })
-      .catch((error) => {
-        if (!axios.isCancel(error)) {
-          console.error("Error fetching categories:", error);
-        }
-      });
+
+    getCategories(controller.signal).then((result) => {
+      if (result.type === "success") setAllCategories(result.data);
+      else if (result.type === "error")
+        console.error("Error fetching categories:", result.message);
+    });
 
     return () => controller.abort();
   }, []);
@@ -128,14 +118,14 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
           setPage((prevPage) => prevPage + 1);
         }
       },
-      { rootMargin: "100px" }
+      { rootMargin: "100px" },
     );
-    
+
     const currentLoader = loaderRef.current;
     if (currentLoader) {
       observer.observe(currentLoader);
     }
-    
+
     return () => {
       if (currentLoader) {
         observer.unobserve(currentLoader);

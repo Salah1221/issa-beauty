@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { homeLoader, HomeLoaderData, Product } from "./utilities";
-import axios from "axios";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import {
+  Product,
+  ProductsByCategory,
+  getProduct,
+  getProductsByCategory,
+} from "@/features/products/data/products";
+import { Card, CardContent } from "@/common/ui/components/card";
+import { Badge } from "@/common/ui/components/badge";
+import { Skeleton } from "@/common/ui/components/skeleton";
+import { Button } from "@/common/ui/components/button";
 import { Copy, ArrowLeft, CircleCheck } from "lucide-react";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";
@@ -13,26 +17,29 @@ import { SkeletonProductCategory } from "./Home";
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [productsByCategory, setProductsByCategory] = useState<HomeLoaderData>(
-    {},
-  );
+  const [productsByCategory, setProductsByCategory] =
+    useState<ProductsByCategory>({});
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [urlCopied, setUrlCopied] = useState(false);
   const navigate = useNavigate();
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // A cached image can finish loading before React attaches onLoad, so the
+  // event never fires. Reconcile against the element's actual state whenever
+  // the displayed image changes.
+  useEffect(() => {
+    setImgLoaded(imgRef.current?.complete ?? false);
+  }, [product?.imageUrl]);
 
   const fetchProduct = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`/api/products/${productId}`);
-      const data = response.data;
-      if (!data.success) throw new Error("Error in server");
-      setProduct(data.data);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-    } finally {
-      setLoading(false);
-    }
+    if (!productId) return;
+    setLoading(true);
+    const result = await getProduct(productId);
+    if (result.type === "success") setProduct(result.data);
+    else if (result.type === "error")
+      console.error("Error fetching product:", result.message);
+    setLoading(false);
   }, [productId]);
 
   useEffect(() => {
@@ -42,10 +49,14 @@ const ProductPage = () => {
   }, [productId, fetchProduct]);
 
   useEffect(() => {
-    homeLoader().then((data) => {
-      setProductsByCategory(data);
+    const controller = new AbortController();
+
+    getProductsByCategory(controller.signal).then((result) => {
+      if (result.type === "success") setProductsByCategory(result.data);
     });
-  });
+
+    return () => controller.abort();
+  }, []);
 
   const handleWhatsAppContact = () => {
     const message = encodeURIComponent(
@@ -112,19 +123,17 @@ const ProductPage = () => {
       </Button>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-40 my-8">
         <Card className="overflow-hidden">
-          <CardContent className="p-0">
+          <CardContent className="relative aspect-square p-0">
             <img
+              ref={imgRef}
               src={product.imageUrl}
               alt={product.name}
-              className={`w-full h-auto object-cover ${
-                imgLoaded ? "" : "hidden"
+              className={`h-full w-full object-cover transition-opacity duration-500 ${
+                imgLoaded ? "opacity-100" : "opacity-0"
               }`}
-              style={{ aspectRatio: 1 }}
               onLoad={handleImageLoad}
             />
-            {!imgLoaded && (
-              <Skeleton className="w-full h-auto" style={{ aspectRatio: 1 }} />
-            )}
+            {!imgLoaded && <Skeleton className="absolute inset-0 h-full w-full" />}
           </CardContent>
         </Card>
         <div className="space-y-4 self-center">
