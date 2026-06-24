@@ -64,13 +64,20 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0" id="logo">
+          <Link
+            to="/"
+            className="flex-shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            id="logo"
+            aria-label="Issa Beauty home"
+          >
             <svg
               width="163"
               height="37"
               viewBox="0 0 163 37"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-hidden="true"
             >
               <path
                 d="M15.56 3.76439C14.9204 4.91745 12.7902 5.65651 14.24 12.7787C14.04 12.6585 13.472 12.4181 12.8 12.4181C8.12 12.4181 4.48 14.1409 2 15.6633C5.84 17.2258 4.16 19.87 10.88 21.6728C10.96 21.152 11.552 19.87 13.28 18.9085C15.44 17.7065 17.24 16.0239 19.28 10.7355C19.24 11.3765 18.944 13.1874 18.08 15.3027C17 17.9469 14.24 19.6296 12.32 21.793C10.4 23.9565 8.84 31.7689 13.28 34.6535C11.48 24.4372 27.44 16.6248 21.08 6.64897C20 4.9663 18.92 4.84611 16.76 1C16.52 1.56089 16.16 2.68267 15.56 3.76439Z"
