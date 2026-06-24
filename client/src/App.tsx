@@ -5,6 +5,7 @@ import {
   useNavigate,
   Outlet,
   useLocation,
+  ScrollRestoration,
 } from "react-router-dom";
 import Home from "@/features/products/ui/Home";
 import Navbar from "@/layout/ui/Navbar";
@@ -37,6 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ search, setSearch }) => {
 
   return (
     <>
+      <ScrollRestoration />
       <Navbar search={search} setSearch={setSearch} />
       <Outlet />
       <Footer />
