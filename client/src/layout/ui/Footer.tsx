@@ -1,31 +1,52 @@
 import { Separator } from "@/common/ui/components/separator";
 import { Mail, Phone, MapPin } from "lucide-react";
+import issaBeautyImg from "@/assets/issa_beauty.png";
 
 const Footer = () => {
   return (
     <footer className="bg-background text-foreground border-t">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
           <div>
-            <h3 className="text-lg font-semibold mb-4">About Us</h3>
-            <p className="text-muted-foreground">
-              We are a company dedicated to providing high-quality products and
-              excellent customer service.
+            <div className="flex items-center gap-2 mb-4">
+              <img
+                src={issaBeautyImg}
+                alt=""
+                className="h-9 w-9"
+                aria-hidden="true"
+              />
+              <span className="text-lg font-semibold">Issa Beauty</span>
+            </div>
+            <p className="text-muted-foreground max-w-sm">
+              Carefully curated beauty and skincare, with friendly service you
+              can count on. Browse the collection or reach out — we're happy to
+              help you find the right products.
             </p>
           </div>
 
-          <div>
+          <div className="sm:justify-self-end">
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-muted-foreground">
-              <li className="flex items-center">
-                <Mail className="w-4 h-4 mr-2" /> issa.beauty.inc@gmail.com
+            <ul className="space-y-3 text-muted-foreground">
+              <li>
+                <a
+                  href="mailto:issa.beauty.inc@gmail.com"
+                  className="flex items-center hover:text-foreground transition-colors"
+                >
+                  <Mail className="w-4 h-4 mr-2 shrink-0" />
+                  issa.beauty.inc@gmail.com
+                </a>
               </li>
-              <li className="flex items-center">
-                <Phone className="w-4 h-4 mr-2" /> +961 76 374 336
+              <li>
+                <a
+                  href="tel:+96176374336"
+                  className="flex items-center hover:text-foreground transition-colors"
+                >
+                  <Phone className="w-4 h-4 mr-2 shrink-0" /> +961 76 374 336
+                </a>
               </li>
-              <li className="flex items-center">
-                <MapPin className="w-4 h-4 mr-2" /> Qobbeh near Najem's Shoes,
-                Tripoli, Lebanon
+              <li className="flex items-start">
+                <MapPin className="w-4 h-4 mr-2 mt-1 shrink-0" /> Qobbeh near
+                Najem's Shoes, Tripoli, Lebanon
               </li>
             </ul>
           </div>
@@ -37,7 +58,12 @@ const Footer = () => {
             reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0 social-links">
-            <a href="https://tiktok.com/@mohamad.issa2323">
+            <a
+              href="https://tiktok.com/@mohamad.issa2323"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Issa Beauty on TikTok"
+            >
               <svg
                 height={24}
                 width={24}
@@ -56,6 +82,7 @@ const Footer = () => {
               href="https://wa.me/+96176374336"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Issa Beauty on WhatsApp"
             >
               <svg
                 role="img"
@@ -71,7 +98,12 @@ const Footer = () => {
                 />
               </svg>
             </a>
-            <a href="https://www.instagram.com/issabeauty20?igsh=eW44YXpuZWtpNXQz">
+            <a
+              href="https://www.instagram.com/issabeauty20?igsh=eW44YXpuZWtpNXQz"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Issa Beauty on Instagram"
+            >
               <svg
                 role="img"
                 viewBox="0 0 24 24"
