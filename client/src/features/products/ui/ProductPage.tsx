@@ -48,6 +48,12 @@ const ProductPage = () => {
     }
   }, [productId, fetchProduct]);
 
+  // Land at the top when opening a product, including when navigating between
+  // products (e.g. picking a similar product further down the page).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [productId]);
+
   useEffect(() => {
     const controller = new AbortController();
 
