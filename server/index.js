@@ -1,4 +1,4 @@
-import { BannerImg, Category, Product } from "./models.js";
+import { BannerImg, Category, Product } from "./models/models.js";
 import express from "express";
 import { connectDB } from "./db.js";
 import path from "path";
