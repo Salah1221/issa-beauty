@@ -68,33 +68,63 @@ app.get("/api/products", async (req, res) => {
   const search = req.query.search || "";
   const category = req.query.category || "";
   const sortOrder = req.query.sort || "newest";
+  const minPrice = parseFloat(req.query.minPrice);
+  const maxPrice = parseFloat(req.query.maxPrice);
 
   try {
-    let query = {};
+    const match = {};
     if (search) {
-      query = {
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          { description: { $regex: search, $options: "i" } },
-          { category: { $regex: search, $options: "i" } },
-        ],
-      };
+      match.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } },
+      ];
     }
 
     if (category && category !== "all") {
-      query.category = category;
+      match.category = category;
     }
 
-    let sort = { createdAt: -1 }; // Default to newest first
-    if (sortOrder === "oldest") {
-      sort = { createdAt: 1 };
-    }
+    // Price after discount, used for both filtering and sorting.
+    const finalPrice = {
+      $multiply: [
+        "$price",
+        {
+          $subtract: [
+            1,
+            { $divide: [{ $ifNull: ["$discountPercentage", 0] }, 100] },
+          ],
+        },
+      ],
+    };
 
-    const products = await Product.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit);
-    const total = await Product.countDocuments(query);
+    const priceMatch = {};
+    if (!Number.isNaN(minPrice)) priceMatch.$gte = minPrice;
+    if (!Number.isNaN(maxPrice)) priceMatch.$lte = maxPrice;
+
+    // Sort by createdAt or by the discounted price; _id keeps paging stable on ties.
+    let sort = { createdAt: -1, _id: -1 }; // Default to newest first
+    if (sortOrder === "oldest") sort = { createdAt: 1, _id: 1 };
+    else if (sortOrder === "price-asc") sort = { finalPrice: 1, _id: 1 };
+    else if (sortOrder === "price-desc") sort = { finalPrice: -1, _id: -1 };
+
+    const pipeline = [
+      { $match: match },
+      { $addFields: { finalPrice } },
+    ];
+    if (Object.keys(priceMatch).length) {
+      pipeline.push({ $match: { finalPrice: priceMatch } });
+    }
+    pipeline.push({
+      $facet: {
+        data: [{ $sort: sort }, { $skip: skip }, { $limit: limit }],
+        totalCount: [{ $count: "count" }],
+      },
+    });
+
+    const [result] = await Product.aggregate(pipeline);
+    const products = result.data;
+    const total = result.totalCount[0]?.count || 0;
 
     res.status(200).json({
       success: true,
@@ -102,6 +132,52 @@ app.get("/api/products", async (req, res) => {
       total,
       page,
       pages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Min/max discounted price for the current search + category, so the price
+// slider can auto-scale to the catalog instead of using fixed buckets.
+app.get("/api/products-price-range", async (req, res) => {
+  const search = req.query.search || "";
+  const category = req.query.category || "";
+
+  try {
+    const match = {};
+    if (search) {
+      match.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (category && category !== "all") {
+      match.category = category;
+    }
+
+    const finalPrice = {
+      $multiply: [
+        "$price",
+        {
+          $subtract: [
+            1,
+            { $divide: [{ $ifNull: ["$discountPercentage", 0] }, 100] },
+          ],
+        },
+      ],
+    };
+
+    const [result] = await Product.aggregate([
+      { $match: match },
+      { $group: { _id: null, min: { $min: finalPrice }, max: { $max: finalPrice } } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      min: result?.min ?? 0,
+      max: result?.max ?? 0,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
