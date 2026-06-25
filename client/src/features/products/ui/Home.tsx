@@ -19,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
 import { ArrowRight } from "lucide-react";
+import { ikUrl } from "@/common/utils/utils";
 import issaBeautyImg from "@/assets/issa_beauty.png";
 
 export const SkeletonProductCategory = () => (
@@ -120,7 +121,7 @@ const Home: React.FC = () => {
                   <Card className="overflow-hidden">
                     <CardContent className="aspect-video p-0">
                       <img
-                        src={bannerImage.imageUrl}
+                        src={ikUrl(bannerImage.imageUrl, "w-1600,q-80,f-auto")}
                         alt=""
                         className="object-cover w-full h-full"
                       />

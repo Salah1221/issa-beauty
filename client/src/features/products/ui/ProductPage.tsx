@@ -13,6 +13,7 @@ import { Button } from "@/common/ui/components/button";
 import { Copy, ArrowLeft, CircleCheck } from "lucide-react";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";
+import { ikUrl } from "@/common/utils/utils";
 
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -126,7 +127,7 @@ const ProductPage = () => {
           <CardContent className="relative aspect-square p-0">
             <img
               ref={imgRef}
-              src={product.imageUrl}
+              src={ikUrl(product.imageUrl, "w-900,q-80,f-auto")}
               alt={product.name}
               className={`h-full w-full object-cover transition-opacity duration-500 ${
                 imgLoaded ? "opacity-100" : "opacity-0"
