@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card, CardFooter } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
 import { Link } from "react-router-dom";
+import { ikUrl } from "@/common/utils/utils";
 
 type ProductCardProps = {
   id: string;
@@ -45,7 +46,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
         <img
           ref={imgRef}
-          src={imageUrl}
+          src={ikUrl(imageUrl, "w-600,q-80,f-auto")}
           alt={name}
           loading="lazy"
           className={`h-[200px] w-full object-cover transition-all duration-500 group-hover:scale-105 ${
