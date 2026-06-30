@@ -67,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex-shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex-shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-w-[130px] sm:max-w-none"
             id="logo"
             aria-label="Issa Beauty home"
           >

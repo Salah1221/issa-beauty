@@ -22,23 +22,22 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({
           More
         </Button>
       </div>
-      <div className="relative">
-        <div className="flex overflow-x-auto pb-4 -mx-4 px-4">
-          <div className="flex space-x-4 horizontal-container">
-            {products.map((product, i) => (
-              <div key={i} className="flex-none w-[260px] sm:w-[280px]">
-                <ProductCard
-                  id={product._id}
-                  name={product.name}
-                  imageUrl={product.imageUrl}
-                  price={product.price}
-                  discountPercentage={product.discountPercentage}
-                  category={product.category}
-                  in_stock={product.in_stock}
-                />
-              </div>
-            ))}
-          </div>
+      {/* Horizontal strip: the partially-visible next card cues scrollability. */}
+      <div className="flex overflow-x-auto pb-4 -mx-4 px-4">
+        <div className="flex space-x-4 horizontal-container">
+          {products.map((product, i) => (
+            <div key={i} className="flex-none w-[260px] sm:w-[280px]">
+              <ProductCard
+                id={product._id}
+                name={product.name}
+                imageUrl={product.imageUrl}
+                price={product.price}
+                discountPercentage={product.discountPercentage}
+                category={product.category}
+                in_stock={product.in_stock}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -152,21 +152,19 @@ const ProductPage = () => {
           )}
           <p className="text-muted-foreground">{product.description}</p>
           <div className="text-2xl md:text-3xl font-bold">
-            {product.discountPercentage && product.discountPercentage > 0 && (
+            {product.discountPercentage && product.discountPercentage > 0 ? (
               <>
                 $
                 {(
                   product.price *
                   (1 - product.discountPercentage / 100)
                 ).toFixed(2)}
+                <span className="ml-2 text-sm line-through text-gray-500">
+                  ${product.price.toFixed(2)}
+                </span>
               </>
-            )}
-            {product.discountPercentage && product.discountPercentage > 0 ? (
-              <span className="ml-2 text-sm line-through text-gray-500">
-                ${product.price.toFixed(2)}
-              </span>
             ) : (
-              ""
+              <>${product.price.toFixed(2)}</>
             )}
           </div>
           {product.discountPercentage && product.discountPercentage > 0 ? (

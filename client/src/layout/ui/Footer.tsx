@@ -57,12 +57,13 @@ const Footer = () => {
             &copy; {new Date(Date.now()).getFullYear()} Issa Beauty. All rights
             reserved.
           </p>
-          <div className="flex space-x-4 mt-4 md:mt-0 social-links">
+          <div className="flex space-x-2 mt-4 md:mt-0 social-links">
             <a
               href="https://tiktok.com/@mohamad.issa2323"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Issa Beauty on TikTok"
+              className="p-2"
             >
               <svg
                 height={24}
@@ -83,6 +84,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Issa Beauty on WhatsApp"
+              className="p-2"
             >
               <svg
                 role="img"
@@ -103,6 +105,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Issa Beauty on Instagram"
+              className="p-2"
             >
               <svg
                 role="img"

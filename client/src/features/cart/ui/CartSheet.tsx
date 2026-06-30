@@ -51,44 +51,50 @@ export default function CartSheet() {
                 <img
                   src={ikUrl(item.imageUrl, "w-160,q-80,f-auto")}
                   alt={item.name}
-                  className="h-16 w-16 rounded object-cover"
+                  className="h-16 w-16 shrink-0 rounded-md object-cover"
                 />
-                <div className="flex flex-1 flex-col">
-                  <span className="line-clamp-2 text-sm font-medium">
-                    {item.name}
-                  </span>
-                  <span className="text-sm font-semibold">
-                    ${discountedPrice(item.price, item.discountPercentage).toFixed(2)}
-                  </span>
-                  <div className="mt-auto flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => setQuantity(item.productId, item.quantity - 1)}
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="w-6 text-center text-sm">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="line-clamp-2 text-sm font-medium leading-snug">
+                      {item.name}
+                    </span>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="ml-auto h-7 w-7 text-destructive"
+                      className="-mr-2 -mt-1 h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
                       onClick={() => removeItem(item.productId)}
-                      aria-label="Remove item"
+                      aria-label={`Remove ${item.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="inline-flex items-center rounded-md border">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-none rounded-l-md"
+                        onClick={() => setQuantity(item.productId, item.quantity - 1)}
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </Button>
+                      <span className="w-8 text-center text-sm tabular-nums">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-none rounded-r-md"
+                        onClick={() => setQuantity(item.productId, item.quantity + 1)}
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <span className="text-sm font-semibold tabular-nums">
+                      ${(discountedPrice(item.price, item.discountPercentage) * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>

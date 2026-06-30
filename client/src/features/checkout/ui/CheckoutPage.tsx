@@ -139,6 +139,8 @@ export default function CheckoutPage() {
             value={form.fullName}
             onChange={set("fullName")}
             required
+            autoComplete="name"
+            aria-label="Full name"
           />
           <div className="flex gap-2">
             <Select value={countryCode} onValueChange={setCountryCode}>
@@ -161,13 +163,18 @@ export default function CheckoutPage() {
               value={form.phone}
               onChange={set("phone")}
               required
+              autoComplete="tel-national"
+              aria-label="Phone number"
             />
           </div>
           <Input
             type="email"
+            inputMode="email"
             placeholder="Email (optional)"
             value={form.email}
             onChange={set("email")}
+            autoComplete="email"
+            aria-label="Email"
           />
 
           {/* Divider with notch */}
@@ -185,22 +192,29 @@ export default function CheckoutPage() {
             value={form.address}
             onChange={set("address")}
             required
+            autoComplete="street-address"
+            aria-label="Address"
           />
           <Input
             placeholder="City *"
             value={form.city}
             onChange={set("city")}
             required
+            autoComplete="address-level2"
+            aria-label="City"
           />
           <Input
             placeholder="Area (optional)"
             value={form.area}
             onChange={set("area")}
+            autoComplete="address-level3"
+            aria-label="Area"
           />
           <Input
             placeholder="Notes (optional)"
             value={form.notes}
             onChange={set("notes")}
+            aria-label="Order notes"
           />
 
           {error && (
