@@ -14,6 +14,7 @@ import Products from "@/features/products/ui/Products";
 import Footer from "@/layout/ui/Footer";
 import ProductPage from "@/features/products/ui/ProductPage";
 import { CartProvider } from "@/features/cart/data/CartContext";
+import CheckoutPage from "@/features/checkout/ui/CheckoutPage";
 
 type LayoutProps = {
   search: string;
@@ -67,6 +68,10 @@ function App() {
         {
           path: "products/:productId",
           element: <ProductPage />,
+        },
+        {
+          path: "checkout",
+          element: <CheckoutPage />,
         },
       ],
     },
