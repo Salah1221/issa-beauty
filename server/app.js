@@ -1,9 +1,10 @@
-import { BannerImg, Category, Product } from "./models/models.js";
+import { BannerImg, Category, Order, Product } from "./models/models.js";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import fs from "fs";
+import { validateOrderInput, buildOrderDoc, generateOrderNumber } from "./orders.js";
 
 const getAllCategories = async () => {
   return await Category.find();
@@ -226,6 +227,43 @@ app.get("/api/banner-images", async (req, res) => {
     const bannerImages = await BannerImg.find();
 
     res.status(200).json({ success: true, data: bannerImages });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post("/api/orders", async (req, res) => {
+  const { valid, errors } = validateOrderInput(req.body);
+  if (!valid) {
+    return res.status(400).json({ success: false, message: errors[0] });
+  }
+  try {
+    const ids = req.body.items.map((i) => i.productId);
+    const products = await Product.find({ _id: { $in: ids } });
+    const productsById = {};
+    products.forEach((p) => {
+      productsById[String(p._id)] = p;
+    });
+
+    let doc;
+    try {
+      doc = buildOrderDoc(req.body, productsById);
+    } catch (e) {
+      return res.status(e.status || 400).json({ success: false, message: e.message });
+    }
+
+    let saved;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        saved = await Order.create({ ...doc, orderNumber: generateOrderNumber() });
+        break;
+      } catch (e) {
+        if (e.code === 11000 && attempt === 0) continue; // duplicate orderNumber, retry once
+        throw e;
+      }
+    }
+
+    res.status(201).json({ success: true, data: saved });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
