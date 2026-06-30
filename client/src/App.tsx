@@ -15,6 +15,7 @@ import Footer from "@/layout/ui/Footer";
 import ProductPage from "@/features/products/ui/ProductPage";
 import { CartProvider } from "@/features/cart/data/CartContext";
 import CheckoutPage from "@/features/checkout/ui/CheckoutPage";
+import OrderConfirmation from "@/features/checkout/ui/OrderConfirmation";
 
 type LayoutProps = {
   search: string;
@@ -72,6 +73,10 @@ function App() {
         {
           path: "checkout",
           element: <CheckoutPage />,
+        },
+        {
+          path: "checkout/success",
+          element: <OrderConfirmation />,
         },
       ],
     },
