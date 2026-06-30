@@ -10,8 +10,9 @@ import { Card, CardContent } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
 import { Skeleton } from "@/common/ui/components/skeleton";
 import { Button } from "@/common/ui/components/button";
-import { Copy, ArrowLeft, CircleCheck, ShoppingCart } from "lucide-react";
+import { Copy, ArrowLeft, CircleCheck, ShoppingCart, Plus, Minus } from "lucide-react";
 import { useCart } from "@/features/cart/data/CartContext";
+import { toast } from "sonner";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";
 import { ikUrl } from "@/common/utils/utils";
@@ -24,6 +25,7 @@ const ProductPage = () => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -174,19 +176,63 @@ const ProductPage = () => {
           ) : (
             ""
           )}
+          {product.in_stock !== false && (
+            <div className="mt-4 flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">
+                Quantity
+              </span>
+              <div className="flex items-center rounded-md border">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10"
+                  aria-label="Decrease quantity"
+                  disabled={quantity <= 1}
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span
+                  className="w-10 text-center text-sm font-medium tabular-nums"
+                  aria-live="polite"
+                >
+                  {quantity}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10"
+                  aria-label="Increase quantity"
+                  onClick={() => setQuantity((q) => q + 1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 mt-4">
             <Button
               variant="default"
               disabled={product.in_stock === false}
-              onClick={() =>
-                addItem({
-                  productId: product._id,
-                  name: product.name,
-                  price: product.price,
-                  discountPercentage: product.discountPercentage,
-                  imageUrl: product.imageUrl,
-                })
-              }
+              onClick={() => {
+                addItem(
+                  {
+                    productId: product._id,
+                    name: product.name,
+                    price: product.price,
+                    discountPercentage: product.discountPercentage,
+                    imageUrl: product.imageUrl,
+                  },
+                  quantity,
+                );
+                toast.success("Added to cart", {
+                  description:
+                    quantity > 1
+                      ? `${quantity} × ${product.name}`
+                      : product.name,
+                });
+                setQuantity(1);
+              }}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
               Add to cart

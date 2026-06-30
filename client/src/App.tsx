@@ -14,6 +14,7 @@ import Products from "@/features/products/ui/Products";
 import Footer from "@/layout/ui/Footer";
 import ProductPage from "@/features/products/ui/ProductPage";
 import { CartProvider } from "@/features/cart/data/CartContext";
+import { Toaster } from "@/common/ui/components/sonner";
 import CheckoutPage from "@/features/checkout/ui/CheckoutPage";
 import OrderConfirmation from "@/features/checkout/ui/OrderConfirmation";
 
@@ -85,6 +86,7 @@ function App() {
   return (
     <CartProvider>
       <RouterProvider router={router} />
+      <Toaster />
     </CartProvider>
   );
 }

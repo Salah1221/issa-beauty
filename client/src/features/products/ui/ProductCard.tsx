@@ -6,6 +6,7 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ikUrl } from "@/common/utils/utils";
 import { useCart } from "@/features/cart/data/CartContext";
+import { toast } from "sonner";
 
 type ProductCardProps = {
   id: string;
@@ -95,12 +96,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ) : (
             <Button
               size="icon"
-              className="relative z-10 h-8 w-8"
+              className="relative z-10 h-10 w-10"
               aria-label={`Add ${name} to cart`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 addItem({ productId: id, name, price, discountPercentage, imageUrl });
+                toast.success("Added to cart", { description: name });
               }}
             >
               <ShoppingCart className="h-4 w-4" />
