@@ -13,6 +13,7 @@ import ErrorPage from "@/layout/ui/ErrorPage";
 import Products from "@/features/products/ui/Products";
 import Footer from "@/layout/ui/Footer";
 import ProductPage from "@/features/products/ui/ProductPage";
+import { CartProvider } from "@/features/cart/data/CartContext";
 
 type LayoutProps = {
   search: string;
@@ -71,7 +72,11 @@ function App() {
     },
   ]), [search]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
+  );
 }
 
 export default App;
