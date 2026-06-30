@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card, CardFooter } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
+import { Button } from "@/common/ui/components/button";
+import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ikUrl } from "@/common/utils/utils";
+import { useCart } from "@/features/cart/data/CartContext";
 
 type ProductCardProps = {
   id: string;
@@ -24,6 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   in_stock,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { addItem } = useCart();
   const imgRef = useRef<HTMLImageElement>(null);
 
   // A cached image can finish loading before React attaches onLoad, so the
@@ -86,8 +90,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <span className="text-lg font-bold">${price.toFixed(2)}</span>
             )}
           </div>
-          {in_stock !== undefined && !in_stock && (
+          {in_stock === false ? (
             <Badge variant="destructive">Out of stock</Badge>
+          ) : (
+            <Button
+              size="icon"
+              className="relative z-10 h-8 w-8"
+              aria-label={`Add ${name} to cart`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addItem({ productId: id, name, price, discountPercentage, imageUrl });
+              }}
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
           )}
         </div>
       </CardFooter>

@@ -4,6 +4,7 @@ import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
 import { Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
+import CartSheet from "@/features/cart/ui/CartSheet";
 
 type NavbarProps = {
   search: string;
@@ -133,6 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
                 <span className="sr-only">Toggle theme</span>
               </Button>
             )}
+            <CartSheet />
           </div>
 
           {/* Search button for mobile */}

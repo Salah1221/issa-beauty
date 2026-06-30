@@ -10,7 +10,8 @@ import { Card, CardContent } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
 import { Skeleton } from "@/common/ui/components/skeleton";
 import { Button } from "@/common/ui/components/button";
-import { Copy, ArrowLeft, CircleCheck } from "lucide-react";
+import { Copy, ArrowLeft, CircleCheck, ShoppingCart } from "lucide-react";
+import { useCart } from "@/features/cart/data/CartContext";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";
 import { ikUrl } from "@/common/utils/utils";
@@ -71,6 +72,8 @@ const ProductPage = () => {
     setUrlCopied(true);
     setTimeout(() => setUrlCopied(false), 2000);
   };
+
+  const { addItem } = useCart();
 
   const handleReturn = () => {
     navigate(-1);
@@ -172,6 +175,22 @@ const ProductPage = () => {
             ""
           )}
           <div className="flex flex-wrap gap-2 mt-4">
+            <Button
+              variant="default"
+              disabled={product.in_stock === false}
+              onClick={() =>
+                addItem({
+                  productId: product._id,
+                  name: product.name,
+                  price: product.price,
+                  discountPercentage: product.discountPercentage,
+                  imageUrl: product.imageUrl,
+                })
+              }
+            >
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Add to cart
+            </Button>
             <Button onClick={handleWhatsAppContact} variant="default">
               <svg
                 role="img"
