@@ -28,7 +28,7 @@ import {
 } from "@/common/ui/components/sheet";
 import { Slider } from "@/common/ui/components/slider";
 import { SlidersHorizontal } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type ProductsProps = {
   search: string;
@@ -61,6 +61,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
   );
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const location = useLocation();
+  const navigate = useNavigate();
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchProducts = useCallback(
@@ -304,8 +305,23 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
             ))
           : !loading &&
             products.length === 0 && (
-              <div className="font-bold justify-self-center text-4xl col-span-full text-muted-foreground">
-                No Products
+              <div className="col-span-full flex flex-col items-center justify-center gap-3 py-16 text-center">
+                <p className="text-xl font-semibold text-muted-foreground">
+                  No products found
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your filters or browse our full catalog.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCategory("all");
+                    setAppliedPrice(null);
+                    navigate("/products");
+                  }}
+                >
+                  Browse all products
+                </Button>
               </div>
             )}
         {loading &&

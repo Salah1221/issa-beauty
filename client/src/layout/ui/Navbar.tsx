@@ -4,6 +4,7 @@ import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
 import { Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
+import CartSheet from "@/features/cart/ui/CartSheet";
 
 type NavbarProps = {
   search: string;
@@ -66,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex-shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex-shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-w-[130px] sm:max-w-none"
             id="logo"
             aria-label="Issa Beauty home"
           >
@@ -133,6 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
                 <span className="sr-only">Toggle theme</span>
               </Button>
             )}
+            <CartSheet />
           </div>
 
           {/* Search button for mobile */}

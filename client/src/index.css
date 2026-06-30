@@ -121,3 +121,25 @@
     fill: hsl(var(--primary));
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Neutralize product card hover scale */
+  .group:hover .group-hover\:scale-105,
+  [class*="hover:scale"] {
+    transform: none !important;
+  }
+
+  /* Stop carousel from auto-advancing visually */
+  .embla__container {
+    transition: none !important;
+  }
+}
