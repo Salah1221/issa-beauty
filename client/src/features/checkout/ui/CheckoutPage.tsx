@@ -8,6 +8,16 @@ import {
 } from "@/features/checkout/data/orders";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/common/ui/components/select";
+
+// Supported dialing codes. Lebanon only for now; add entries here to extend.
+const COUNTRY_CODES = [{ code: "+961", label: "🇱🇧 +961" }];
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
@@ -22,6 +32,7 @@ export default function CheckoutPage() {
     area: "",
     notes: "",
   });
+  const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0].code);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +66,7 @@ export default function CheckoutPage() {
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
       customer: {
         fullName: form.fullName,
-        phone: form.phone,
+        phone: `${countryCode} ${form.phone.trim()}`,
         email: form.email || undefined,
       },
       shipping: {
@@ -129,12 +140,29 @@ export default function CheckoutPage() {
             onChange={set("fullName")}
             required
           />
-          <Input
-            placeholder="Phone *"
-            value={form.phone}
-            onChange={set("phone")}
-            required
-          />
+          <div className="flex gap-2">
+            <Select value={countryCode} onValueChange={setCountryCode}>
+              <SelectTrigger className="w-[110px] shrink-0" aria-label="Country code">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRY_CODES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              type="tel"
+              inputMode="tel"
+              className="flex-1"
+              placeholder="Phone *"
+              value={form.phone}
+              onChange={set("phone")}
+              required
+            />
+          </div>
           <Input
             type="email"
             placeholder="Email (optional)"
