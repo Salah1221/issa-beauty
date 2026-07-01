@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import multer from "multer";
 import fs from "fs";
 import { validateOrderInput, buildOrderDoc, generateOrderNumber } from "./orders.js";
+import { sendEmail, orderConfirmationEmail, newOrderNotificationEmail } from "./email.js";
 
 const getAllCategories = async () => {
   return await Category.find();
@@ -261,6 +262,19 @@ app.post("/api/orders", async (req, res) => {
         if (e.code === 11000 && attempt === 0) continue; // duplicate orderNumber, retry once
         throw e;
       }
+    }
+
+    if (saved.customer?.email) {
+      const { subject, html } = orderConfirmationEmail(saved);
+      sendEmail({ to: saved.customer.email, subject, html }).catch((e) =>
+        console.error("order confirmation email failed", e),
+      );
+    }
+    if (process.env.STORE_ORDER_EMAIL) {
+      const { subject, html } = newOrderNotificationEmail(saved);
+      sendEmail({ to: process.env.STORE_ORDER_EMAIL, subject, html }).catch((e) =>
+        console.error("new-order alert failed", e),
+      );
     }
 
     res.status(201).json({ success: true, data: saved });
