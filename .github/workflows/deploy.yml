@@ -34,6 +34,8 @@ jobs:
           cat <<EOF > .env
           PORT=${{ secrets.PORT }}
           MONGODB_URI=${{ secrets.MONGODB_URI }}
+          RESEND=${{ secrets.RESEND }}
+          STORE_ORDER_EMAIL=${{ secrets.STORE_ORDER_EMAIL }}
           EOF
 
       - name: Deploy with rsync
