@@ -3,6 +3,14 @@ import { Resend } from "resend";
 const FROM = "ISSA Beauty <orders@send.issabeauty.org>";
 const resend = process.env.RESEND ? new Resend(process.env.RESEND) : null;
 
+const esc = (s) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 const money = (n) => `$${Number(n).toFixed(2)}`;
 
 function shell(heading, bodyHtml) {
@@ -20,7 +28,7 @@ function itemsTable(order) {
   const rows = order.items
     .map(
       (it) =>
-        `<tr><td style="padding:6px 0;">${it.name} × ${it.quantity}</td><td style="padding:6px 0;text-align:right;">${money(it.lineTotal)}</td></tr>`,
+        `<tr><td style="padding:6px 0;">${esc(it.name)} × ${it.quantity}</td><td style="padding:6px 0;text-align:right;">${money(it.lineTotal)}</td></tr>`,
     )
     .join("");
   return `<table style="width:100%;border-collapse:collapse;font-size:14px;">
@@ -34,16 +42,16 @@ function itemsTable(order) {
 
 function addressBlock(order) {
   const s = order.shipping || {};
-  const area = s.area ? `, ${s.area}` : "";
-  const notes = s.notes ? `<br/><span style="color:#666;">Notes: ${s.notes}</span>` : "";
-  return `<p style="font-size:14px;line-height:1.5;">${order.customer.fullName}<br/>${order.customer.phone}<br/>${s.address}${area}, ${s.city}${notes}</p>`;
+  const area = s.area ? `, ${esc(s.area)}` : "";
+  const notes = s.notes ? `<br/><span style="color:#666;">Notes: ${esc(s.notes)}</span>` : "";
+  return `<p style="font-size:14px;line-height:1.5;">${esc(order.customer.fullName)}<br/>${esc(order.customer.phone)}<br/>${esc(s.address)}${area}, ${esc(s.city)}${notes}</p>`;
 }
 
 export function orderConfirmationEmail(order) {
-  const firstName = order.customer.fullName.split(" ")[0];
+  const firstName = esc(order.customer.fullName.split(" ")[0]);
   const html = shell(
     `Thanks for your order, ${firstName}!`,
-    `<p style="font-size:14px;">Your order <strong>${order.orderNumber}</strong> is confirmed. Payment is <strong>cash on delivery</strong>.</p>
+    `<p style="font-size:14px;">Your order <strong>${esc(order.orderNumber)}</strong> is confirmed. Payment is <strong>cash on delivery</strong>.</p>
      <h2 style="font-size:14px;margin:20px 0 8px;">Order</h2>${itemsTable(order)}
      <h2 style="font-size:14px;margin:20px 0 8px;">Delivery to</h2>${addressBlock(order)}`,
   );
@@ -51,10 +59,10 @@ export function orderConfirmationEmail(order) {
 }
 
 export function newOrderNotificationEmail(order) {
-  const email = order.customer.email ? ` · ${order.customer.email}` : "";
+  const email = order.customer.email ? ` · ${esc(order.customer.email)}` : "";
   const html = shell(
-    `New order ${order.orderNumber}`,
-    `<p style="font-size:14px;"><strong>${order.customer.fullName}</strong> · ${order.customer.phone}${email}</p>
+    `New order ${esc(order.orderNumber)}`,
+    `<p style="font-size:14px;"><strong>${esc(order.customer.fullName)}</strong> · ${esc(order.customer.phone)}${email}</p>
      ${itemsTable(order)}
      <h2 style="font-size:14px;margin:20px 0 8px;">Deliver to</h2>${addressBlock(order)}
      <p style="font-size:13px;color:#666;">Cash on delivery.</p>`,
