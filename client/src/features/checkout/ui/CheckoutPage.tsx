@@ -170,9 +170,10 @@ export default function CheckoutPage() {
           <Input
             type="email"
             inputMode="email"
-            placeholder="Email (optional)"
+            placeholder="Email *"
             value={form.email}
             onChange={set("email")}
+            required
             autoComplete="email"
             aria-label="Email"
           />
