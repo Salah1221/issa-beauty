@@ -1,7 +1,6 @@
 import { Resend } from "resend";
 
 const FROM = "ISSA Beauty <orders@send.issabeauty.org>";
-const resend = process.env.RESEND ? new Resend(process.env.RESEND) : null;
 
 const esc = (s) =>
   String(s ?? "")
@@ -71,9 +70,12 @@ export function newOrderNotificationEmail(order) {
 }
 
 export async function sendEmail({ to, subject, html }) {
-  if (!resend) {
+  // Read the key at call time — dotenv.config() runs after this module is
+  // imported, so a module-level read would miss a key set only in .env.
+  const apiKey = process.env.RESEND;
+  if (!apiKey) {
     console.warn("RESEND not set; skipping email:", subject);
     return;
   }
-  await resend.emails.send({ from: FROM, to, subject, html });
+  await new Resend(apiKey).emails.send({ from: FROM, to, subject, html });
 }
