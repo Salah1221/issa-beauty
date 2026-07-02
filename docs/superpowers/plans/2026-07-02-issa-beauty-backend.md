@@ -1859,9 +1859,11 @@ git add -A && git commit -m "feat: admin order routes (list/pending/status + ema
 - Test: `/home/salah/Projects/issa-beauty-backend/src/routes/security.test.ts`
 
 **Reference:** spec §6. Tiered `express-rate-limit`:
-- `strictLimiter` (low max, e.g. `max: 5, windowMs: 60_000`) on `POST /api/orders` and `POST /api/admin/auth/login`.
-- `looseLimiter` (e.g. `max: 100, windowMs: 60_000`) on public GET routes.
+- `strictLimiter` (`max: 10, windowMs: 60_000`) on `POST /api/orders` and `POST /api/admin/auth/login`.
+- `looseLimiter` (`max: 100, windowMs: 60_000`) on public GET routes.
 - Make limits overridable via a factory so the test can construct tiny limits without waiting.
+
+**CRITICAL — do not break earlier suites:** `makeLimiter` stays a pure factory (its unit test constructs a tiny limiter and asserts 429). But the *attachment* of limiters to the real routers/handlers MUST be skipped under test, because the Task 11–16 suites fire many same-IP requests and would otherwise hit 429. Gate every attachment with `if (process.env.NODE_ENV !== "test")`. Vitest sets `NODE_ENV=test`, so in tests no limiter is attached; in dev/prod they are. The `security.test.ts` limiter test exercises `makeLimiter` directly (not through `createApp`), so it is unaffected by the gate. Wiring-into-routes is verified by code review, not an integration test.
 
 **Interfaces:**
 - Produces: `makeLimiter(opts: { windowMs: number; max: number }): RequestHandler`; exported `strictLimiter`, `looseLimiter` with production defaults.
@@ -1930,11 +1932,11 @@ export function makeLimiter(opts: { windowMs: number; max: number }): RateLimitR
   });
 }
 
-export const strictLimiter = makeLimiter({ windowMs: 60_000, max: 5 });
+export const strictLimiter = makeLimiter({ windowMs: 60_000, max: 10 });
 export const looseLimiter = makeLimiter({ windowMs: 60_000, max: 100 });
 ```
 
-Apply: in `public.ts`, `looseLimiter` on the router (GETs) and `strictLimiter` specifically on `POST /orders`. In `admin.ts`, `strictLimiter` on `POST /auth/login`. (Order matters — attach `strictLimiter` to the login/orders handlers directly so it isn't shadowed by a looser router-level limiter.)
+Apply (all gated by `if (process.env.NODE_ENV !== "test")`): in `public.ts`, `looseLimiter` on the router (GETs) and `strictLimiter` specifically on `POST /orders`. In `admin.ts`, `strictLimiter` on `POST /auth/login`. Attach `strictLimiter` to the login/orders handlers directly so it isn't shadowed by a looser router-level limiter. Do NOT put the `NODE_ENV` gate inside `makeLimiter` — the gate lives only at the attachment sites, so the standalone `makeLimiter` unit test still sees real limiting.
 
 - [ ] **Step 4: Run test to verify it passes**
 
