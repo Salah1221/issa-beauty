@@ -35,8 +35,10 @@ jobs:
       - name: Deploy static bundle with rsync
         uses: burnett01/rsync-deployments@5.2
         with:
-          # Mirror the fresh build into the web root; --delete clears stale hashed assets
-          switches: -avz --delete
+          # Mirror the fresh build into the web root; --delete clears stale hashed assets.
+          # --chown/--chmod land the files owned by nginx (www-data) and readable, so no
+          # manual `chown -R www-data:www-data` is ever needed (rsync runs as root here).
+          switches: -avz --delete --chown=www-data:www-data --chmod=D755,F644
           path: ./dist/
           remote_path: /var/www/issa-beauty/client/dist/
           remote_host: ${{ secrets.HOST }}
