@@ -747,79 +747,139 @@ export function StatusStepper({ status }: { status: OrderStatus }) {
 
 ---
 
-## Task S7: OrderNotificationsBell
+## Task S7: OrderNotificationsBell (Sheet on mobile, Popover on desktop)
 
 **Repo:** `issa-beauty`
 
 **Files:**
+- Create: `src/common/utils/useMediaQuery.ts`
 - Create: `src/features/orders/ui/OrderNotificationsBell.tsx`
 
 **Interfaces:**
-- Consumes: `useOrderNotifications` (S4); `STATUS_META` (S6); `Popover*` (S5); `Button` (`@/common/ui/components/button`); `useNavigate` from `react-router-dom`; `Bell` from `lucide-react`.
-- Produces: default export `OrderNotificationsBell` (renders nothing but the bell + badge + popover). Safe to render even with zero tracked orders (shows an empty state).
+- Consumes: `useOrderNotifications` (S4); `STATUS_META` (S6); `Popover*` (S5); `Sheet*` (`@/common/ui/components/sheet` — `Sheet`, `SheetTrigger`, `SheetContent`, `SheetHeader`, `SheetTitle`, with `SheetContent side="bottom"`); `OrderNotification` (S3); `Button`; `useNavigate` from `react-router-dom`; `Bell` from `lucide-react`.
+- Produces:
+  - `useMediaQuery(query: string): boolean`
+  - default export `OrderNotificationsBell`. Renders the bell + unread badge, and on open shows the notification list in a **bottom Sheet on mobile (<640px)** and a **Popover on desktop (≥640px)**. Opening marks all read. Selecting a notification closes the overlay (controlled `open` state) and navigates to `/orders/:orderNumber`. Safe with zero tracked orders (empty state).
 
-> **Deviation from spec (intentional):** the spec described a bottom Sheet on
-> mobile + Popover on desktop. For v1 we use a single width-capped responsive
-> Popover (`w-80 max-w-[calc(100vw-2rem)]`) — touch-friendly and simpler. A
-> mobile Sheet can be added later if desired.
+- [ ] **Step 1: Create `src/common/utils/useMediaQuery.ts`:**
 
-- [ ] **Step 1: Implement `OrderNotificationsBell.tsx`:**
+```ts
+import { useEffect, useState } from "react";
+
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia(query).matches : false,
+  );
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const onChange = () => setMatches(mql.matches);
+    onChange();
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+```
+
+- [ ] **Step 2: Implement `OrderNotificationsBell.tsx`** — a shared `NotificationList` (DRY) wrapped in Popover (desktop) or Sheet (mobile), controlled so selection closes it:
 
 ```tsx
+import { useState } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/common/ui/components/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/common/ui/components/sheet";
+import { useMediaQuery } from "@/common/utils/useMediaQuery";
 import { useOrderNotifications } from "../data/useOrderNotifications";
 import { STATUS_META } from "../data/statusMeta";
+import { OrderNotification } from "../data/notifications";
+
+function NotificationList({
+  notifications,
+  onSelect,
+}: {
+  notifications: OrderNotification[];
+  onSelect: (orderNumber: string) => void;
+}) {
+  if (notifications.length === 0) {
+    return <p className="px-4 py-6 text-center text-sm text-muted-foreground">No updates yet.</p>;
+  }
+  return (
+    <ul className="max-h-[60vh] divide-y overflow-y-auto sm:max-h-80">
+      {notifications.map((n) => (
+        <li key={n.id}>
+          <button
+            type="button"
+            onClick={() => onSelect(n.orderNumber)}
+            className="block w-full px-4 py-3 text-left text-sm hover:bg-accent/50"
+          >
+            <span className="font-medium">{n.orderNumber}</span> is now{" "}
+            <span className="font-medium">{STATUS_META[n.status].label}</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              {new Date(n.at).toLocaleString()}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function OrderNotificationsBell() {
   const { notifications, unreadCount, markAllRead } = useOrderNotifications();
   const navigate = useNavigate();
+  const isDesktop = useMediaQuery("(min-width: 640px)");
+  const [open, setOpen] = useState(false);
+
+  const onOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (next && unreadCount > 0) markAllRead();
+  };
+  const select = (orderNumber: string) => {
+    setOpen(false);
+    navigate(`/orders/${orderNumber}`);
+  };
+
+  const trigger = (
+    <Button variant="ghost" size="icon" className="relative" aria-label="Order notifications">
+      <Bell className="h-5 w-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </Button>
+  );
+
+  if (isDesktop) {
+    return (
+      <Popover open={open} onOpenChange={onOpenChange}>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+        <PopoverContent align="end" className="w-80 p-0">
+          <div className="border-b px-4 py-3 text-sm font-semibold">Order updates</div>
+          <NotificationList notifications={notifications} onSelect={select} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
 
   return (
-    <Popover onOpenChange={(open) => { if (open && unreadCount > 0) markAllRead(); }}>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label="Order notifications">
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 max-w-[calc(100vw-2rem)] p-0">
-        <div className="border-b px-4 py-3 text-sm font-semibold">Order updates</div>
-        {notifications.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-muted-foreground">No updates yet.</p>
-        ) : (
-          <ul className="max-h-80 divide-y overflow-y-auto">
-            {notifications.map((n) => (
-              <li key={n.id}>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/orders/${n.orderNumber}`)}
-                  className="block w-full px-4 py-3 text-left text-sm hover:bg-accent/50"
-                >
-                  <span className="font-medium">{n.orderNumber}</span> is now{" "}
-                  <span className="font-medium">{STATUS_META[n.status].label}</span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {new Date(n.at).toLocaleString()}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </PopoverContent>
-    </Popover>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>{trigger}</SheetTrigger>
+      <SheetContent side="bottom" className="p-0">
+        <SheetHeader className="border-b px-4 py-3 text-left">
+          <SheetTitle className="text-sm">Order updates</SheetTitle>
+        </SheetHeader>
+        <NotificationList notifications={notifications} onSelect={select} />
+      </SheetContent>
+    </Sheet>
   );
 }
 ```
 
-- [ ] **Step 2: Typecheck** — `pnpm exec tsc -b` → no errors.
-- [ ] **Step 3: Commit** — `git add src/features/orders/ui/OrderNotificationsBell.tsx && git commit -m "feat(orders): notifications bell with popover"`
+- [ ] **Step 3: Typecheck** — `pnpm exec tsc -b` → no errors.
+- [ ] **Step 4: Commit** — `git add src/common/utils/useMediaQuery.ts src/features/orders/ui/OrderNotificationsBell.tsx && git commit -m "feat(orders): notifications bell — sheet on mobile, popover on desktop"`
 
 ---
 
