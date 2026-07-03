@@ -1,6 +1,9 @@
 {
   "name": "issa-beauty",
   "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {
