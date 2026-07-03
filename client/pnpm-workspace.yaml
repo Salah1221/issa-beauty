@@ -1,6 +1,0 @@
-packages:
-  - "." # This tells pnpm to include the root folder
-  - "client" # This tells pnpm to include your frontend folder
-
-onlyBuiltDependencies:
-  - esbuild

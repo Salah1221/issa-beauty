@@ -5,9 +5,9 @@ on:
   push:
     branches: ["main"]
 
-# The storefront is now a static SPA served directly by nginx. It talks to the
-# standalone backend at api.issabeauty.org, so this deploy only builds the client
-# and ships client/dist — no server, no .env, no PM2.
+# The storefront is a static SPA (Vite app at the repo root) served directly by
+# nginx. It talks to the standalone backend at api.issabeauty.org, so this deploy
+# only builds and ships dist/ — no server, no .env, no PM2.
 
 jobs:
   build-and-deploy:
@@ -27,9 +27,8 @@ jobs:
         with:
           version: 10
 
-      - name: Build the client (bakes in VITE_API_BASE_URL from client/.env.production)
+      - name: Build (bakes in VITE_API_BASE_URL from .env.production)
         run: |
-          cd client
           pnpm install
           pnpm run build
 
@@ -38,7 +37,7 @@ jobs:
         with:
           # Mirror the fresh build into the web root; --delete clears stale hashed assets
           switches: -avz --delete
-          path: ./client/dist/
+          path: ./dist/
           remote_path: /var/www/issa-beauty/client/dist/
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
