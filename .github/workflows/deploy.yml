@@ -32,15 +32,26 @@ jobs:
           pnpm install
           pnpm run build
 
-      - name: Deploy static bundle with rsync
-        uses: burnett01/rsync-deployments@5.2
+      - name: Write SSH deploy key
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Deploy static bundle with rsync (retry on transient SSH drops)
+        # The server silently drops one of two near-simultaneous SSH connections (an
+        # anti-brute-force / connection-rate rule), which the storefront usually loses
+        # when it deploys alongside the dashboard — the SYN is dropped, so it hangs and
+        # times out rather than failing fast. ConnectTimeout kills a dropped attempt in
+        # 15s and we retry after the burst window passes. --chown/--chmod land the files
+        # owned by nginx (www-data) and readable, so no manual chown is ever needed
+        # (rsync runs as root on the remote).
+        uses: nick-fields/retry@v3
         with:
-          # Mirror the fresh build into the web root; --delete clears stale hashed assets.
-          # --chown/--chmod land the files owned by nginx (www-data) and readable, so no
-          # manual `chown -R www-data:www-data` is ever needed (rsync runs as root here).
-          switches: -avz --delete --chown=www-data:www-data --chmod=D755,F644
-          path: ./dist/
-          remote_path: /var/www/issa-beauty/client/dist/
-          remote_host: ${{ secrets.HOST }}
-          remote_user: ${{ secrets.USERNAME }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 20
+          command: >-
+            rsync -avz --delete --chown=www-data:www-data --chmod=D755,F644
+            -e "ssh -i $HOME/.ssh/deploy_key -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+            ./dist/ "${{ secrets.USERNAME }}@${{ secrets.HOST }}:/var/www/issa-beauty/client/dist/"
