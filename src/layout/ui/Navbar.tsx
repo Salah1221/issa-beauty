@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import CartSheet from "@/features/cart/ui/CartSheet";
+import OrderNotificationsBell from "@/features/orders/ui/OrderNotificationsBell";
 
 type NavbarProps = {
   search: string;
@@ -134,6 +135,10 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
                 <span className="sr-only">Toggle theme</span>
               </Button>
             )}
+            <Button asChild variant="ghost" size="icon" aria-label="My orders">
+              <Link to="/orders"><Package className="h-5 w-5" /></Link>
+            </Button>
+            <OrderNotificationsBell />
             <CartSheet />
           </div>
 
