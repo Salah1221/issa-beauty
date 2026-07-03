@@ -1,9 +1,13 @@
-name: Deploy to Production
+name: Deploy Storefront (static)
 
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
+
+# The storefront is now a static SPA served directly by nginx. It talks to the
+# standalone backend at api.issabeauty.org, so this deploy only builds the client
+# and ships client/dist — no server, no .env, no PM2.
 
 jobs:
   build-and-deploy:
@@ -16,50 +20,26 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22" # Change this if you use a different Node version
+          node-version: "22"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 10 # Change this if you use a different pnpm version
+          version: 10
 
-      - name: Build the Client
+      - name: Build the client (bakes in VITE_API_BASE_URL from client/.env.production)
         run: |
           cd client
           pnpm install
           pnpm run build
 
-      - name: Create .env file for Server
-        run: |
-          cat <<EOF > .env
-          PORT=${{ secrets.PORT }}
-          MONGODB_URI=${{ secrets.MONGODB_URI }}
-          RESEND=${{ secrets.RESEND }}
-          STORE_ORDER_EMAIL=${{ secrets.STORE_ORDER_EMAIL }}
-          EOF
-
-      - name: Deploy with rsync
+      - name: Deploy static bundle with rsync
         uses: burnett01/rsync-deployments@5.2
         with:
-          # Exclude git, and DO NOT sync node_modules (explained below)
-          switches: -avz --delete --exclude='.git/' --exclude='client/node_modules/' --exclude='node_modules/'
-          path: ./
-          remote_path: /var/www/issa-beauty/
+          # Mirror the fresh build into the web root; --delete clears stale hashed assets
+          switches: -avz --delete
+          path: ./client/dist/
+          remote_path: /var/www/issa-beauty/client/dist/
           remote_host: ${{ secrets.HOST }}
           remote_user: ${{ secrets.USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Install Server dependencies and Restart PM2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/issa-beauty
-
-            # Install only backend dependencies on the actual server
-            pnpm install --prod
-
-            # Restart or start PM2
-            pm2 restart issa-beauty --update-env || NODE_ENV=production pm2 start server/index.js --name "issa-beauty"
