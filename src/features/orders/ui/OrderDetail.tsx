@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
 import { getTrackedOrders, removeTrackedOrder } from "../data/trackedOrders";
 import { trackOrders } from "../data/orderTracking";
@@ -9,6 +9,7 @@ import { StatusStepper } from "./StatusStepper";
 
 export default function OrderDetail() {
   const { orderNumber = "" } = useParams();
+  const navigate = useNavigate();
   const [view, setView] = useState<TrackedOrderView | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "missing">("loading");
 
@@ -41,7 +42,7 @@ export default function OrderDetail() {
         {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · ${view.total.toFixed(2)} · updated {new Date(view.updatedAt).toLocaleString()}
       </p>
       <div className="mt-6 rounded-xl border bg-card p-6"><StatusStepper status={view.status} /></div>
-      <Button variant="ghost" className="mt-6 text-red-600" onClick={() => { removeTrackedOrder(view.orderNumber); history.back(); }}>
+      <Button variant="ghost" className="mt-6 text-red-600" onClick={() => { removeTrackedOrder(view.orderNumber); navigate("/orders"); }}>
         Stop tracking this order
       </Button>
     </div>

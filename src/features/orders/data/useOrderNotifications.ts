@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getTrackedOrders, setLastSeenStatus } from "./trackedOrders";
 import { trackOrders } from "./orderTracking";
@@ -16,19 +16,26 @@ export function useOrderNotifications() {
     setUnread(unreadCountStore());
   }, []);
 
+  const inFlight = useRef(false);
   const refresh = useCallback(async () => {
-    const tracked = getTrackedOrders();
-    if (tracked.length === 0) return;
-    const res = await trackOrders(tracked.map((t) => ({ orderNumber: t.orderNumber, phone: t.phone })));
-    if (res.type !== "success") return; // swallow poll errors, keep last-known state
-    const changes = diffStatuses(tracked, res.data);
-    if (changes.length === 0) return;
-    const added = addNotifications(changes);
-    changes.forEach((c) => setLastSeenStatus(c.orderNumber, c.status));
-    added.forEach((n) =>
-      toast(`Order ${n.orderNumber} is now ${STATUS_META[n.status].label}`),
-    );
-    sync();
+    if (inFlight.current) return;
+    inFlight.current = true;
+    try {
+      const tracked = getTrackedOrders();
+      if (tracked.length === 0) return;
+      const res = await trackOrders(tracked.map((t) => ({ orderNumber: t.orderNumber, phone: t.phone })));
+      if (res.type !== "success") return; // swallow poll errors, keep last-known state
+      const changes = diffStatuses(tracked, res.data);
+      if (changes.length === 0) return;
+      const added = addNotifications(changes);
+      changes.forEach((c) => setLastSeenStatus(c.orderNumber, c.status));
+      added.forEach((n) =>
+        toast(`Order ${n.orderNumber} is now ${STATUS_META[n.status].label}`),
+      );
+      sync();
+    } finally {
+      inFlight.current = false;
+    }
   }, [sync]);
 
   const markAllRead = useCallback(() => {

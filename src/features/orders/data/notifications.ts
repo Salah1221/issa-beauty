@@ -50,7 +50,7 @@ export function addNotifications(
     at: now,
     read: false,
   }));
-  if (added.length) save([...added, ...getNotifications()]);
+  if (added.length) save([...added, ...getNotifications()].slice(0, 50));
   return added;
 }
 
