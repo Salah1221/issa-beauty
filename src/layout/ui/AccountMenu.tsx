@@ -62,7 +62,11 @@ export default function AccountMenu() {
         <DropdownMenuItem onSelect={() => requestAnimationFrame(() => setCartOpen(true))}>
           <ShoppingCart className="mr-2 h-4 w-4" />
           Cart
-          {count > 0 && <span className="ml-auto text-xs text-muted-foreground">{count}</span>}
+          {count > 0 && (
+            <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+              {count}
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/orders">
