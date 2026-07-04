@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { Badge } from "@/common/ui/components/badge";
 import { Button } from "@/common/ui/components/button";
 import { getTrackedOrders, removeTrackedOrder } from "../data/trackedOrders";
 import { trackOrders } from "../data/orderTracking";
@@ -36,7 +37,7 @@ export default function OrderDetail() {
       <Link to="/orders" className="text-sm text-muted-foreground hover:underline">← My Orders</Link>
       <div className="mt-3 flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">{view.orderNumber}</h1>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_META[view.status].badgeClass}`}>{STATUS_META[view.status].label}</span>
+        <Badge variant="outline" className={`rounded-full border-transparent ${STATUS_META[view.status].badgeClass}`}>{STATUS_META[view.status].label}</Badge>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
         {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · ${view.total.toFixed(2)} · updated {new Date(view.updatedAt).toLocaleString()}

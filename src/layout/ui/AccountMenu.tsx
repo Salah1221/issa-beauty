@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { User, Package, ShoppingCart, Moon, Sun, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/common/ui/components/avatar";
+import { Badge } from "@/common/ui/components/badge";
 import { Button } from "@/common/ui/components/button";
 import {
   DropdownMenu,
@@ -48,9 +49,9 @@ export default function AccountMenu() {
             </AvatarFallback>
           </Avatar>
           {count > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
+            <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full border-transparent px-1 text-[10px] font-bold leading-none">
               {count}
-            </span>
+            </Badge>
           )}
         </Button>
       </DropdownMenuTrigger>
@@ -63,9 +64,9 @@ export default function AccountMenu() {
           <ShoppingCart className="mr-2 h-4 w-4" />
           Cart
           {count > 0 && (
-            <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+            <Badge className="ml-auto h-5 min-w-5 justify-center rounded-full border-transparent px-1.5">
               {count}
-            </span>
+            </Badge>
           )}
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

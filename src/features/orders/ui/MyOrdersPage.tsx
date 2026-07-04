@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Badge } from "@/common/ui/components/badge";
 import { Button } from "@/common/ui/components/button";
 import { getTrackedOrders } from "../data/trackedOrders";
 import { trackOrders } from "../data/orderTracking";
@@ -48,7 +49,7 @@ export default function MyOrdersPage() {
                   <Link to={`/orders/${v.orderNumber}`} className="block rounded-xl border bg-card p-4 transition-colors hover:bg-accent/50">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium">{v.orderNumber}</span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_META[v.status].badgeClass}`}>{STATUS_META[v.status].label}</span>
+                      <Badge variant="outline" className={`rounded-full border-transparent ${STATUS_META[v.status].badgeClass}`}>{STATUS_META[v.status].label}</Badge>
                     </div>
                     <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
                       <span>{new Date(v.createdAt).toLocaleDateString()}</span>
