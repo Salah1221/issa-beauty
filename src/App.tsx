@@ -22,6 +22,7 @@ import MyOrdersPage from "@/features/orders/ui/MyOrdersPage";
 import OrderDetail from "@/features/orders/ui/OrderDetail";
 import LoginPage from "@/features/auth/ui/LoginPage";
 import RegisterPage from "@/features/auth/ui/RegisterPage";
+import RequireAuth from "@/features/auth/ui/RequireAuth";
 
 type LayoutProps = {
   search: string;
@@ -84,8 +85,8 @@ function App() {
           path: "checkout/success",
           element: <OrderConfirmation />,
         },
-        { path: "orders", element: <MyOrdersPage /> },
-        { path: "orders/:orderNumber", element: <OrderDetail /> },
+        { path: "orders", element: <RequireAuth><MyOrdersPage /></RequireAuth> },
+        { path: "orders/:orderNumber", element: <RequireAuth><OrderDetail /></RequireAuth> },
         { path: "login", element: <LoginPage /> },
         { path: "register", element: <RegisterPage /> },
       ],

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
 import { useAuth } from "../data/AuthContext";
@@ -7,6 +7,8 @@ import { useAuth } from "../data/AuthContext";
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +19,7 @@ export default function LoginPage() {
     setError(null); setLoading(true);
     const res = await login(email.trim(), password);
     setLoading(false);
-    if (res.ok) navigate("/");
+    if (res.ok) navigate(from, { replace: true });
     else setError(res.message ?? "Invalid email or password");
   };
 

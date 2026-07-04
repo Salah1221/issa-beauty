@@ -45,8 +45,8 @@ export default function AccountMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative rounded-full" aria-label="Account menu">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-muted">
-              <User className="h-4 w-4" />
+            <AvatarFallback className="bg-muted text-xs font-semibold uppercase">
+              {user ? user.email.charAt(0) : <User className="h-4 w-4" />}
             </AvatarFallback>
           </Avatar>
           {count > 0 && (
