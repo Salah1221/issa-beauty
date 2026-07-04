@@ -24,6 +24,9 @@ type CartContextValue = {
   removeItem: (productId: string) => void;
   setQuantity: (productId: string, quantity: number) => void;
   clear: () => void;
+  // Cart drawer visibility, lifted here so the account menu can open it.
+  open: boolean;
+  setOpen: (open: boolean) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -47,6 +50,7 @@ function loadCart(): CartItem[] {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadCart);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
@@ -92,8 +96,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<CartContextValue>(
-    () => ({ items, count, subtotal, addItem, removeItem, setQuantity, clear }),
-    [items, count, subtotal],
+    () => ({ items, count, subtotal, addItem, removeItem, setQuantity, clear, open, setOpen }),
+    [items, count, subtotal, open],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

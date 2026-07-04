@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
-import { Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
 import CartSheet from "@/features/cart/ui/CartSheet";
 import AccountMenu from "@/layout/ui/AccountMenu";
@@ -14,8 +13,6 @@ type NavbarProps = {
 
 const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [mounted, setMounted] = useState(false);
   const [localSearch, setLocalSearch] = useState(search);
 
   useEffect(() => {
@@ -31,22 +28,6 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
   useEffect(() => {
     setLocalSearch(search);
   }, [search]);
-
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.body.classList.toggle("dark", savedTheme === "dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.body.classList.toggle("dark", newTheme === "dark");
-    localStorage.setItem("theme", newTheme);
-  };
 
   useEffect(() => {
     const searchInput = document.querySelector<HTMLInputElement>("#search");
@@ -119,31 +100,11 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
               </div>
             </div>
 
-            {/* Theme toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className="ml-2 md:ml-4"
-              >
-                {theme === "light" ? (
-                  <Moon className="h-5 w-5" />
-                ) : (
-                  <Sun className="h-5 w-5" />
-                )}
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            )}
-            <AccountMenu />
-            <CartSheet />
-          </div>
-
-          {/* Search button for mobile */}
-          <div className="md:hidden ml-2">
+            {/* Search toggle (mobile only) */}
             <Button
               variant="ghost"
               size="icon"
+              className="md:hidden"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
             >
               {isSearchOpen ? (
@@ -153,6 +114,12 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
               )}
               <span className="sr-only">Toggle search</span>
             </Button>
+
+            {/* Account hub (cart, orders, theme, sign in) — last item */}
+            <AccountMenu />
+
+            {/* Cart drawer itself; opened from the account menu (no visible trigger) */}
+            <CartSheet />
           </div>
         </div>
 
