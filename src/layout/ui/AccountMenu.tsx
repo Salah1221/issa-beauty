@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { User, Package, ShoppingCart, Moon, Sun, LogIn } from "lucide-react";
-import { toast } from "sonner";
+import { User, Package, ShoppingCart, Moon, Sun, LogIn, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/common/ui/components/avatar";
 import { Badge } from "@/common/ui/components/badge";
 import { Button } from "@/common/ui/components/button";
@@ -14,12 +13,14 @@ import {
   DropdownMenuTrigger,
 } from "@/common/ui/components/dropdown-menu";
 import { useCart } from "@/features/cart/data/CartContext";
+import { useAuth } from "@/features/auth/data/AuthContext";
 
 // Single navbar hub: cart, orders, theme, and (placeholder) auth live behind
 // one avatar so the mobile navbar stays uncluttered. Becomes the real account
 // menu once customer accounts exist.
 export default function AccountMenu() {
   const { count, setOpen: setCartOpen } = useCart();
+  const { user, logout } = useAuth();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
 
@@ -56,7 +57,7 @@ export default function AccountMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>Guest</DropdownMenuLabel>
+        <DropdownMenuLabel className="truncate">{user ? user.email : "Guest"}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {/* Defer opening to the next frame so the menu closes first (avoids the
             dropdown/sheet focus-trap race). */}
@@ -82,10 +83,19 @@ export default function AccountMenu() {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => toast("Accounts are coming soon.")}>
-          <LogIn className="mr-2 h-4 w-4" />
-          Log in / Sign up
-        </DropdownMenuItem>
+        {user ? (
+          <DropdownMenuItem onSelect={() => { logout(); }}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Log out
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link to="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Log in / Sign up
+            </Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
