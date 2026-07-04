@@ -2,6 +2,15 @@
 
 _Date: 2026-07-03 · Repos: `issa-beauty` (storefront) + `issa-beauty-backend`_
 
+> **Addendum (2026-07-04):** After implementation, the **in-site notification**
+> half of this design was removed. Guests already receive email on order
+> placement and on every meaningful status change (backend `statusUpdateEmail`),
+> so the notification bell + polling duplicated that and cluttered the navbar.
+> What shipped: the backend `POST /api/orders/track` endpoint and the on-demand
+> **My Orders** tracking page, with its entry point behind a "Guest" avatar
+> menu. No in-site notifications, no accounts. Sections below about the bell,
+> polling hook, and notification store are historical.
+
 ## Overview
 
 Give guest shoppers a way to (1) track the status of their orders on a

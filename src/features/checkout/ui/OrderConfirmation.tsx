@@ -15,7 +15,8 @@ export default function OrderConfirmation() {
       return;
     }
     try {
-      setOrder(JSON.parse(raw) as PlacedOrder);
+      const parsed = JSON.parse(raw) as PlacedOrder;
+      setOrder(parsed);
     } catch {
       navigate("/", { replace: true });
     }
@@ -80,6 +81,10 @@ export default function OrderConfirmation() {
           <p className="mt-1 text-muted-foreground">Notes: {order.shipping.notes}</p>
         )}
       </div>
+
+      <Button asChild variant="outline" className="mt-8 w-full">
+        <Link to={`/orders/${order.orderNumber}`}>Track your order</Link>
+      </Button>
 
       <Button asChild className="mt-8 w-full">
         <Link to="/products">Continue shopping</Link>

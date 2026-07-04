@@ -14,9 +14,15 @@ import Products from "@/features/products/ui/Products";
 import Footer from "@/layout/ui/Footer";
 import ProductPage from "@/features/products/ui/ProductPage";
 import { CartProvider } from "@/features/cart/data/CartContext";
+import { AuthProvider } from "@/features/auth/data/AuthContext";
 import { Toaster } from "@/common/ui/components/sonner";
 import CheckoutPage from "@/features/checkout/ui/CheckoutPage";
 import OrderConfirmation from "@/features/checkout/ui/OrderConfirmation";
+import MyOrdersPage from "@/features/orders/ui/MyOrdersPage";
+import OrderDetail from "@/features/orders/ui/OrderDetail";
+import LoginPage from "@/features/auth/ui/LoginPage";
+import RegisterPage from "@/features/auth/ui/RegisterPage";
+import RequireAuth from "@/features/auth/ui/RequireAuth";
 
 type LayoutProps = {
   search: string;
@@ -79,15 +85,21 @@ function App() {
           path: "checkout/success",
           element: <OrderConfirmation />,
         },
+        { path: "orders", element: <RequireAuth><MyOrdersPage /></RequireAuth> },
+        { path: "orders/:orderNumber", element: <RequireAuth><OrderDetail /></RequireAuth> },
+        { path: "login", element: <LoginPage /> },
+        { path: "register", element: <RegisterPage /> },
       ],
     },
   ]), [search]);
 
   return (
-    <CartProvider>
-      <RouterProvider router={router} />
-      <Toaster />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

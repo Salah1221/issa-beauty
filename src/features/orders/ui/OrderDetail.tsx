@@ -1,0 +1,46 @@
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Badge } from "@/common/ui/components/badge";
+import { Button } from "@/common/ui/components/button";
+import { getMyOrders } from "../data/orders";
+import { TrackedOrderView } from "../data/orderTypes";
+import { STATUS_META } from "../data/statusMeta";
+import { StatusStepper } from "./StatusStepper";
+
+export default function OrderDetail() {
+  const { orderNumber = "" } = useParams();
+  const [view, setView] = useState<TrackedOrderView | null>(null);
+  const [state, setState] = useState<"loading" | "ok" | "missing">("loading");
+
+  useEffect(() => {
+    getMyOrders().then((res) => {
+      if (res.type === "success") {
+        const found = res.data.find((o) => o.orderNumber === orderNumber) ?? null;
+        setView(found); setState(found ? "ok" : "missing");
+      } else setState("missing");
+    });
+  }, [orderNumber]);
+
+  if (state === "loading") return <div className="mx-auto max-w-2xl px-4 py-8"><p className="text-muted-foreground">Loading…</p></div>;
+  if (state === "missing" || !view)
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-8 text-center">
+        <p className="text-muted-foreground">We couldn't find that order.</p>
+        <Button asChild className="mt-4"><Link to="/orders">Back to my orders</Link></Button>
+      </div>
+    );
+
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+      <Link to="/orders" className="text-sm text-muted-foreground hover:underline">← My Orders</Link>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">{view.orderNumber}</h1>
+        <Badge variant="outline" className={`rounded-full border-transparent ${STATUS_META[view.status].badgeClass}`}>{STATUS_META[view.status].label}</Badge>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · ${view.total.toFixed(2)} · updated {new Date(view.updatedAt).toLocaleString()}
+      </p>
+      <div className="mt-6 rounded-xl border bg-card p-6"><StatusStepper status={view.status} /></div>
+    </div>
+  );
+}

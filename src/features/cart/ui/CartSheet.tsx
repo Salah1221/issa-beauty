@@ -1,12 +1,10 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { Plus, Minus, Trash2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   SheetFooter,
 } from "@/common/ui/components/sheet";
 import { Button } from "@/common/ui/components/button";
@@ -14,8 +12,7 @@ import { useCart, discountedPrice } from "@/features/cart/data/CartContext";
 import { ikUrl } from "@/common/utils/utils";
 
 export default function CartSheet() {
-  const { items, count, subtotal, setQuantity, removeItem } = useCart();
-  const [open, setOpen] = useState(false);
+  const { items, subtotal, setQuantity, removeItem, open, setOpen } = useCart();
   const navigate = useNavigate();
 
   const goCheckout = () => {
@@ -25,16 +22,6 @@ export default function CartSheet() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label="Open cart">
-          <ShoppingCart className="h-5 w-5" />
-          {count > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
-              {count}
-            </span>
-          )}
-        </Button>
-      </SheetTrigger>
       <SheetContent className="flex w-full flex-col sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Your Cart</SheetTitle>

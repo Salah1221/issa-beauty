@@ -10,6 +10,7 @@ const apiClient: AxiosInstance = axios.create({
   // In production this points at the standalone backend (api.issabeauty.org).
   // In dev it's undefined, so requests stay relative and hit the Vite proxy.
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
