@@ -20,6 +20,8 @@ import CheckoutPage from "@/features/checkout/ui/CheckoutPage";
 import OrderConfirmation from "@/features/checkout/ui/OrderConfirmation";
 import MyOrdersPage from "@/features/orders/ui/MyOrdersPage";
 import OrderDetail from "@/features/orders/ui/OrderDetail";
+import LoginPage from "@/features/auth/ui/LoginPage";
+import RegisterPage from "@/features/auth/ui/RegisterPage";
 
 type LayoutProps = {
   search: string;
@@ -84,6 +86,8 @@ function App() {
         },
         { path: "orders", element: <MyOrdersPage /> },
         { path: "orders/:orderNumber", element: <OrderDetail /> },
+        { path: "login", element: <LoginPage /> },
+        { path: "register", element: <RegisterPage /> },
       ],
     },
   ]), [search]);
