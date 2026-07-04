@@ -92,7 +92,7 @@ export default function OrderNotificationsBell() {
         <DrawerHeader className="border-b py-3 text-left">
           <DrawerTitle className="text-sm font-semibold">Order updates</DrawerTitle>
           <DrawerDescription className="sr-only">
-            Recent status changes for the orders you're tracking
+            Recent status changes for your orders
           </DrawerDescription>
         </DrawerHeader>
         <div className="pb-[env(safe-area-inset-bottom)]">
