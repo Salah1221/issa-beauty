@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { CircleCheck } from "lucide-react";
 import { Button } from "@/common/ui/components/button";
 import { type PlacedOrder } from "@/features/checkout/data/orders";
-import { addTrackedOrder } from "@/features/orders/data/trackedOrders";
-import { OrderStatus } from "@/features/orders/data/orderTypes";
 
 export default function OrderConfirmation() {
   const navigate = useNavigate();
@@ -19,7 +17,6 @@ export default function OrderConfirmation() {
     try {
       const parsed = JSON.parse(raw) as PlacedOrder;
       setOrder(parsed);
-      addTrackedOrder({ orderNumber: parsed.orderNumber, phone: parsed.customer.phone, status: (parsed.status as OrderStatus) ?? "pending" });
     } catch {
       navigate("/", { replace: true });
     }

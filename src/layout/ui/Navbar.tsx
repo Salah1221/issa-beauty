@@ -5,6 +5,8 @@ import { Input } from "@/common/ui/components/input";
 import { Link } from "react-router-dom";
 import CartSheet from "@/features/cart/ui/CartSheet";
 import AccountMenu from "@/layout/ui/AccountMenu";
+import OrderNotificationsBell from "@/features/orders/ui/OrderNotificationsBell";
+import { useAuth } from "@/features/auth/data/AuthContext";
 
 type NavbarProps = {
   search: string;
@@ -12,6 +14,7 @@ type NavbarProps = {
 };
 
 const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
+  const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(search);
 
@@ -116,6 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
             </Button>
 
             {/* Account hub (cart, orders, theme, sign in) — last item */}
+            {user && <OrderNotificationsBell />}
             <AccountMenu />
 
             {/* Cart drawer itself; opened from the account menu (no visible trigger) */}

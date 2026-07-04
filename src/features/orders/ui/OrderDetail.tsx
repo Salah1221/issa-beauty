@@ -1,25 +1,23 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Badge } from "@/common/ui/components/badge";
 import { Button } from "@/common/ui/components/button";
-import { getTrackedOrders, removeTrackedOrder } from "../data/trackedOrders";
-import { trackOrders } from "../data/orderTracking";
+import { getMyOrders } from "../data/orders";
 import { TrackedOrderView } from "../data/orderTypes";
 import { STATUS_META } from "../data/statusMeta";
 import { StatusStepper } from "./StatusStepper";
 
 export default function OrderDetail() {
   const { orderNumber = "" } = useParams();
-  const navigate = useNavigate();
   const [view, setView] = useState<TrackedOrderView | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "missing">("loading");
 
   useEffect(() => {
-    const tracked = getTrackedOrders().find((t) => t.orderNumber === orderNumber);
-    if (!tracked) { setState("missing"); return; }
-    trackOrders([{ orderNumber: tracked.orderNumber, phone: tracked.phone }]).then((res) => {
-      if (res.type === "success" && res.data.length === 1) { setView(res.data[0]); setState("ok"); }
-      else setState("missing");
+    getMyOrders().then((res) => {
+      if (res.type === "success") {
+        const found = res.data.find((o) => o.orderNumber === orderNumber) ?? null;
+        setView(found); setState(found ? "ok" : "missing");
+      } else setState("missing");
     });
   }, [orderNumber]);
 
@@ -27,7 +25,7 @@ export default function OrderDetail() {
   if (state === "missing" || !view)
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 text-center">
-        <p className="text-muted-foreground">We couldn't load that order.</p>
+        <p className="text-muted-foreground">We couldn't find that order.</p>
         <Button asChild className="mt-4"><Link to="/orders">Back to my orders</Link></Button>
       </div>
     );
@@ -43,9 +41,6 @@ export default function OrderDetail() {
         {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · ${view.total.toFixed(2)} · updated {new Date(view.updatedAt).toLocaleString()}
       </p>
       <div className="mt-6 rounded-xl border bg-card p-6"><StatusStepper status={view.status} /></div>
-      <Button variant="ghost" className="mt-6 text-red-600" onClick={() => { removeTrackedOrder(view.orderNumber); navigate("/orders"); }}>
-        Stop tracking this order
-      </Button>
     </div>
   );
 }
