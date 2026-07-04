@@ -3,7 +3,14 @@ import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/common/ui/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/common/ui/components/popover";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/common/ui/components/sheet";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/common/ui/components/drawer";
 import { useMediaQuery } from "@/common/utils/useMediaQuery";
 import { useOrderNotifications } from "../data/useOrderNotifications";
 import { STATUS_META } from "../data/statusMeta";
@@ -79,14 +86,19 @@ export default function OrderNotificationsBell() {
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent side="bottom" className="p-0">
-        <SheetHeader className="border-b px-4 py-3 text-left">
-          <SheetTitle className="text-sm">Order updates</SheetTitle>
-        </SheetHeader>
-        <NotificationList notifications={notifications} onSelect={select} />
-      </SheetContent>
-    </Sheet>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="border-b py-3 text-left">
+          <DrawerTitle className="text-sm font-semibold">Order updates</DrawerTitle>
+          <DrawerDescription className="sr-only">
+            Recent status changes for the orders you're tracking
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="pb-[env(safe-area-inset-bottom)]">
+          <NotificationList notifications={notifications} onSelect={select} />
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

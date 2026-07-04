@@ -20,12 +20,13 @@ import {
 } from "@/common/ui/components/select";
 import { Badge } from "@/common/ui/components/badge";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/common/ui/components/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/common/ui/components/drawer";
 import { Slider } from "@/common/ui/components/slider";
 import { SlidersHorizontal } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -266,8 +267,8 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
 
       {/* Mobile: collapse filters behind a sheet to keep the toolbar tidy */}
       <div className="sm:hidden mb-6">
-        <Sheet>
-          <SheetTrigger asChild>
+        <Drawer>
+          <DrawerTrigger asChild>
             <Button variant="outline" className="w-full justify-between">
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4" />
@@ -277,16 +278,19 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
                 <Badge className="ml-2">{activeFilterCount}</Badge>
               )}
             </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-xl">
-            <SheetHeader className="mb-4">
-              <SheetTitle>Filters &amp; Sort</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-5 pb-2">
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader className="text-left">
+              <DrawerTitle>Filters &amp; Sort</DrawerTitle>
+              <DrawerDescription className="sr-only">
+                Filter and sort the product list
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="flex flex-col gap-5 px-4 pb-8">
               {filterFields}
             </div>
-          </SheetContent>
-        </Sheet>
+          </DrawerContent>
+        </Drawer>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
