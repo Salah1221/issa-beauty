@@ -26,6 +26,10 @@ location ~ ^/products/[^/]+$ {
     if ($is_crawler) {
         proxy_pass <BACKEND>/render$request_uri;
     }
+    # If the backend meta-service is down, crawlers fall back to the SPA shell
+    # (static default OG tags) instead of a bare 502.
+    proxy_intercept_errors on;
+    error_page 502 503 504 = /index.html;
     try_files $uri /index.html;
 }
 
@@ -40,8 +44,13 @@ location / {
 }
 ```
 
-> `proxy_pass` inside `if` is one of the few directives allowed there. If the
-> backend is unreachable, the `try_files` fallback still serves the SPA shell.
+> `proxy_pass` inside `if` is one of the few directives allowed there. Once it
+> runs, it owns the response for that request, so `try_files` never gets a
+> chance to fall back — for crawler traffic, graceful degradation on a backend
+> outage comes from `proxy_intercept_errors on;` plus the `error_page 502 503
+> 504 = /index.html;` directives, which rewrite the failed proxy response to
+> the SPA shell. `try_files` alone only covers non-crawler traffic, which never
+> enters the `if` branch.
 
 ## 3. Apply & verify
 
