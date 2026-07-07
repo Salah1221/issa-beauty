@@ -133,9 +133,12 @@ const Home: React.FC = () => {
       />
       {bannerLoading ? (
         // Reserve the banner's height up front so the carousel doesn't push the
-        // page down when it arrives (the fix for the large layout shift).
+        // page down when it arrives. Mirrors the carousel's box exactly (p-1 pad
+        // + rounded card + aspect-video) so the swap causes no shift.
         <div className="mt-8">
-          <Skeleton className="w-full aspect-video rounded-xl" />
+          <div className="p-1">
+            <Skeleton className="w-full aspect-video rounded-lg" />
+          </div>
         </div>
       ) : (
         bannerImages.length > 0 && (
