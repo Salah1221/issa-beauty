@@ -13,8 +13,10 @@ import { AuthProvider } from "@/features/auth/data/AuthContext";
 import { Toaster } from "@/common/ui/components/sonner";
 import { Skeleton } from "@/common/ui/components/skeleton";
 import RequireAuth from "@/features/auth/ui/RequireAuth";
+// Home is the landing page — load it eagerly (not lazy) so there is no
+// Suspense-fallback→content swap that shoves the whole page down (CLS).
+import Home from "@/features/products/ui/Home";
 
-const Home = React.lazy(() => import("@/features/products/ui/Home"));
 const Products = React.lazy(() => import("@/features/products/ui/Products"));
 const ProductPage = React.lazy(() => import("@/features/products/ui/ProductPage"));
 const CheckoutPage = React.lazy(() => import("@/features/checkout/ui/CheckoutPage"));

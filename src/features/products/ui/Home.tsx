@@ -91,9 +91,6 @@ const Home: React.FC = () => {
   const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-  // Track the banner fetch separately so we can reserve its space while loading
-  // instead of injecting the carousel late (which shoves the page down → CLS).
-  const [bannerLoading, setBannerLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -105,7 +102,6 @@ const Home: React.FC = () => {
 
     getBannerImages(controller.signal).then((result) => {
       if (result.type === "success") setBannerImages(result.data);
-      if (result.type !== "canceled") setBannerLoading(false);
     });
 
     return () => controller.abort();
@@ -131,18 +127,8 @@ const Home: React.FC = () => {
         title="Issa Beauty"
         description="Shop carefully curated beauty and skincare at Issa Beauty, Tripoli, Lebanon — makeup, skincare and more, with cash on delivery."
       />
-      {bannerLoading ? (
-        // Reserve the banner's height up front so the carousel doesn't push the
-        // page down when it arrives. Mirrors the carousel's box exactly (p-1 pad
-        // + rounded card + aspect-video) so the swap causes no shift.
+      {bannerImages?.length > 0 && (
         <div className="mt-8">
-          <div className="p-1">
-            <Skeleton className="w-full aspect-video rounded-lg" />
-          </div>
-        </div>
-      ) : (
-        bannerImages.length > 0 && (
-          <div className="mt-8">
             <Carousel
               className="w-full aspect-video"
               setApi={setCarouselApi}
@@ -200,8 +186,7 @@ const Home: React.FC = () => {
                 ))}
               </div>
             )}
-          </div>
-        )
+        </div>
       )}
       <AllProductsSection />
       {isLoading ? (
