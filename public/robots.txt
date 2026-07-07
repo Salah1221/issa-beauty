@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /orders
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://issabeauty.org/sitemap.xml

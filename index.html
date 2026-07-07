@@ -5,7 +5,31 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/issa_beauty.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Apply the saved theme before first paint to avoid a light-mode flash for
+       dark-mode users. Kept inline and tiny so it runs before the app loads. -->
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("theme") === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <title>Issa Beauty</title>
+  <meta name="description"
+    content="Carefully curated beauty and skincare from Issa Beauty, Tripoli, Lebanon. Browse the collection and order with cash on delivery." />
+
+  <!-- Default social share preview; individual routes override these at runtime. -->
+  <meta property="og:site_name" content="Issa Beauty" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Issa Beauty" />
+  <meta property="og:description"
+    content="Carefully curated beauty and skincare from Issa Beauty, Tripoli, Lebanon." />
+  <meta property="og:image" content="/issa_beauty.png" />
+  <meta name="twitter:card" content="summary_large_image" />
 </head>
 
 <body>

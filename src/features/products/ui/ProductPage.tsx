@@ -2,9 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Product,
-  ProductsByCategory,
   getProduct,
-  getProductsByCategory,
+  getRelatedProducts,
 } from "@/features/products/data/products";
 import { Card, CardContent } from "@/common/ui/components/card";
 import { Badge } from "@/common/ui/components/badge";
@@ -16,14 +15,18 @@ import { toast } from "sonner";
 import ProductCategory from "./ProductCategory";
 import { SkeletonProductCategory } from "./Home";
 import { ikUrl } from "@/common/utils/utils";
+import { formatPrice } from "@/common/utils/currency";
+import Seo from "@/common/seo/Seo";
 
 const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [productsByCategory, setProductsByCategory] =
-    useState<ProductsByCategory>({});
+  const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(
+    null,
+  );
   const [imgLoaded, setImgLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [urlCopied, setUrlCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
@@ -40,9 +43,19 @@ const ProductPage = () => {
     if (!productId) return;
     setLoading(true);
     const result = await getProduct(productId);
-    if (result.type === "success") setProduct(result.data);
-    else if (result.type === "error")
-      console.error("Error fetching product:", result.message);
+    if (result.type === "success") {
+      setProduct(result.data);
+      setError(null);
+    } else if (result.type === "error") {
+      if (result.code === 404) {
+        // Genuine not-found: leave product null and fall through to the
+        // "Product not found" state rather than the retryable error state.
+        setProduct(null);
+        setError(null);
+      } else {
+        setError(result.message);
+      }
+    }
     setLoading(false);
   }, [productId]);
 
@@ -53,14 +66,17 @@ const ProductPage = () => {
   }, [productId, fetchProduct]);
 
   useEffect(() => {
-    const controller = new AbortController();
+    if (!product?.category) return;
 
-    getProductsByCategory(controller.signal).then((result) => {
-      if (result.type === "success") setProductsByCategory(result.data);
+    const controller = new AbortController();
+    setRelatedProducts(null);
+
+    getRelatedProducts(product.category, controller.signal).then((result) => {
+      if (result.type === "success") setRelatedProducts(result.data);
     });
 
     return () => controller.abort();
-  }, []);
+  }, [product?.category]);
 
   const handleWhatsAppContact = () => {
     const message = encodeURIComponent(
@@ -69,10 +85,14 @@ const ProductPage = () => {
     window.open(`https://wa.me/96176374336?text=${message}`, "_blank");
   };
 
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setUrlCopied(true);
-    setTimeout(() => setUrlCopied(false), 2000);
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 2000);
+    } catch {
+      toast.error("Couldn't copy link");
+    }
   };
 
   const { addItem } = useCart();
@@ -109,6 +129,29 @@ const ProductPage = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Button onClick={handleReturn} variant="ghost" className="mt-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+        <div className="my-8 space-y-4">
+          <h1 className="text-2xl font-bold">Something went wrong</h1>
+          <p className="text-muted-foreground">{error}</p>
+          <Button
+            onClick={() => {
+              setError(null);
+              fetchProduct();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,8 +164,43 @@ const ProductPage = () => {
     );
   }
 
+  const hasDiscount =
+    product.discountPercentage !== undefined && product.discountPercentage > 0;
+  const discountedPrice = hasDiscount
+    ? product.price * (1 - (product.discountPercentage as number) / 100)
+    : product.price;
+  const seoDescription =
+    product.description.length > 160
+      ? `${product.description.slice(0, 157).trimEnd()}...`
+      : product.description;
+  const seoImage = ikUrl(product.imageUrl, "w-1200,q-80,f-auto");
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: seoImage,
+    description: product.description,
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      price: Math.round(discountedPrice * 100) / 100,
+      priceCurrency: "USD",
+      availability:
+        product.in_stock === false
+          ? "https://schema.org/OutOfStock"
+          : "https://schema.org/InStock",
+    },
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Seo
+        title={product.name}
+        description={seoDescription}
+        image={seoImage}
+        type="product"
+        jsonLd={jsonLd}
+      />
       <Button onClick={handleReturn} variant="ghost" className="mt-4">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back
@@ -152,19 +230,15 @@ const ProductPage = () => {
           )}
           <p className="text-muted-foreground">{product.description}</p>
           <div className="text-2xl md:text-3xl font-bold">
-            {product.discountPercentage && product.discountPercentage > 0 ? (
+            {hasDiscount ? (
               <>
-                $
-                {(
-                  product.price *
-                  (1 - product.discountPercentage / 100)
-                ).toFixed(2)}
+                {formatPrice(discountedPrice)}
                 <span className="ml-2 text-sm line-through text-gray-500">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
               </>
             ) : (
-              <>${product.price.toFixed(2)}</>
+              <>{formatPrice(product.price)}</>
             )}
           </div>
           {product.discountPercentage && product.discountPercentage > 0 ? (
@@ -266,12 +340,10 @@ const ProductPage = () => {
           </div>
         </div>
       </div>
-      {productsByCategory[`${product.category}`] ? (
+      {relatedProducts ? (
         <ProductCategory
           title={`Similar Products`}
-          products={productsByCategory[`${product.category}`].filter(
-            (product) => product._id !== productId,
-          )}
+          products={relatedProducts.filter((p) => p._id !== productId)}
           onMoreClick={() => navigate(`/products?category=${product.category}`)}
         />
       ) : (

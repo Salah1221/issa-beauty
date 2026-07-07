@@ -6,6 +6,7 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ikUrl } from "@/common/utils/utils";
 import { useCart } from "@/features/cart/data/CartContext";
+import { formatPrice } from "@/common/utils/currency";
 import { toast } from "sonner";
 
 type ProductCardProps = {
@@ -81,14 +82,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {discountedPrice ? (
               <div className="flex items-center">
                 <span className="text-lg font-bold">
-                  ${discountedPrice.toFixed(2)}
+                  {formatPrice(discountedPrice)}
                 </span>
                 <span className="ml-2 text-sm line-through text-gray-500">
-                  ${price.toFixed(2)}
+                  {formatPrice(price)}
                 </span>
               </div>
             ) : (
-              <span className="text-lg font-bold">${price.toFixed(2)}</span>
+              <span className="text-lg font-bold">{formatPrice(price)}</span>
             )}
           </div>
           {in_stock === false ? (

@@ -5,6 +5,7 @@ import { Button } from "@/common/ui/components/button";
 import { getMyOrders } from "../data/orders";
 import { TrackedOrderView } from "../data/orderTypes";
 import { STATUS_META } from "../data/statusMeta";
+import { formatPrice } from "@/common/utils/currency";
 
 type LoadState = "loading" | "ok" | "error";
 
@@ -47,7 +48,7 @@ export default function MyOrdersPage() {
                 </div>
                 <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
                   <span>{new Date(v.createdAt).toLocaleDateString()}</span>
-                  <span className="font-semibold text-foreground">${v.total.toFixed(2)}</span>
+                  <span className="font-semibold text-foreground">{formatPrice(v.total)}</span>
                 </div>
               </Link>
             </li>

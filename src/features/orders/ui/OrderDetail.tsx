@@ -6,6 +6,7 @@ import { getMyOrders } from "../data/orders";
 import { TrackedOrderView } from "../data/orderTypes";
 import { STATUS_META } from "../data/statusMeta";
 import { StatusStepper } from "./StatusStepper";
+import { formatPrice } from "@/common/utils/currency";
 
 export default function OrderDetail() {
   const { orderNumber = "" } = useParams();
@@ -38,7 +39,7 @@ export default function OrderDetail() {
         <Badge variant="outline" className={`rounded-full border-transparent ${STATUS_META[view.status].badgeClass}`}>{STATUS_META[view.status].label}</Badge>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · ${view.total.toFixed(2)} · updated {new Date(view.updatedAt).toLocaleString()}
+        {view.itemCount} {view.itemCount === 1 ? "item" : "items"} · {formatPrice(view.total)} · updated {new Date(view.updatedAt).toLocaleString()}
       </p>
       <div className="mt-6 rounded-xl border bg-card p-6"><StatusStepper status={view.status} /></div>
     </div>

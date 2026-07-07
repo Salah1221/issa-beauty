@@ -113,3 +113,11 @@ export const getProducts = (
       pages: (body.pages as number) ?? 1,
     }),
   );
+
+export const getRelatedProducts = (
+  category: string,
+  signal?: AbortSignal,
+): Promise<ApiResult<Product[]>> =>
+  getProducts({ page: 1, category, limit: 12 }, signal).then((res) =>
+    res.type === "success" ? { type: "success", data: res.data.products } : res,
+  );
