@@ -91,6 +91,9 @@ const Home: React.FC = () => {
   const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  // Track the banner fetch separately so we can reserve its space while loading
+  // instead of injecting the carousel late (which shoves the page down → CLS).
+  const [bannerLoading, setBannerLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -102,6 +105,7 @@ const Home: React.FC = () => {
 
     getBannerImages(controller.signal).then((result) => {
       if (result.type === "success") setBannerImages(result.data);
+      if (result.type !== "canceled") setBannerLoading(false);
     });
 
     return () => controller.abort();
@@ -127,64 +131,74 @@ const Home: React.FC = () => {
         title="Issa Beauty"
         description="Shop carefully curated beauty and skincare at Issa Beauty, Tripoli, Lebanon — makeup, skincare and more, with cash on delivery."
       />
-      {bannerImages?.length > 0 && (
+      {bannerLoading ? (
+        // Reserve the banner's height up front so the carousel doesn't push the
+        // page down when it arrives (the fix for the large layout shift).
         <div className="mt-8">
-          <Carousel
-            className="w-full aspect-video"
-            setApi={setCarouselApi}
-            plugins={[
-              Autoplay({
-                delay: 5000,
-              }),
-            ]}
-          >
-            <CarouselContent>
-              {bannerImages.map((bannerImage) => (
-                <CarouselItem className="w-full" key={bannerImage.imageUrl}>
-                  <div className="p-1">
-                    <Card className="overflow-hidden">
-                      <CardContent className="aspect-video p-0">
-                        <img
-                          src={ikUrl(bannerImage.imageUrl, "w-800,q-80,f-auto")}
-                          alt=""
-                          className="object-cover w-full h-full"
-                        />
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="absolute top-1/2 -translate-y-1/2 left-20 hidden sm:block">
-              <CarouselPrevious />
-            </div>
-            <div className="absolute top-1/2 -translate-y-1/2 right-20 hidden sm:block">
-              <CarouselNext />
-            </div>
-          </Carousel>
-          {bannerImages.length > 1 && (
-            <div className="flex justify-center gap-2 mt-3" role="tablist" aria-label="Carousel slides">
-              {bannerImages.map((_, index) => (
-                <button
-                  key={index}
-                  role="tab"
-                  aria-selected={index === currentSlide}
-                  aria-label={`Go to slide ${index + 1}`}
-                  onClick={() => carouselApi?.scrollTo(index)}
-                  className="flex items-center justify-center py-2 px-1 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
-                >
-                  <span
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      index === currentSlide
-                        ? "w-6 bg-primary"
-                        : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/70"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+          <Skeleton className="w-full aspect-video rounded-xl" />
         </div>
+      ) : (
+        bannerImages.length > 0 && (
+          <div className="mt-8">
+            <Carousel
+              className="w-full aspect-video"
+              setApi={setCarouselApi}
+              plugins={[
+                Autoplay({
+                  delay: 5000,
+                }),
+              ]}
+            >
+              <CarouselContent>
+                {bannerImages.map((bannerImage, index) => (
+                  <CarouselItem className="w-full" key={bannerImage.imageUrl}>
+                    <div className="p-1">
+                      <Card className="overflow-hidden">
+                        <CardContent className="aspect-video p-0">
+                          <img
+                            src={ikUrl(bannerImage.imageUrl, "w-800,q-80,f-auto")}
+                            alt=""
+                            fetchPriority={index === 0 ? "high" : undefined}
+                            loading={index === 0 ? "eager" : "lazy"}
+                            className="object-cover w-full h-full"
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="absolute top-1/2 -translate-y-1/2 left-20 hidden sm:block">
+                <CarouselPrevious />
+              </div>
+              <div className="absolute top-1/2 -translate-y-1/2 right-20 hidden sm:block">
+                <CarouselNext />
+              </div>
+            </Carousel>
+            {bannerImages.length > 1 && (
+              <div className="flex justify-center gap-2 mt-3" role="tablist" aria-label="Carousel slides">
+                {bannerImages.map((_, index) => (
+                  <button
+                    key={index}
+                    role="tab"
+                    aria-selected={index === currentSlide}
+                    aria-label={`Go to slide ${index + 1}`}
+                    onClick={() => carouselApi?.scrollTo(index)}
+                    className="flex items-center justify-center py-2 px-1 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
+                  >
+                    <span
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? "w-6 bg-primary"
+                          : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/70"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )
       )}
       <AllProductsSection />
       {isLoading ? (
