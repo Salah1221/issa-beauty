@@ -6,6 +6,11 @@
   <link rel="icon" type="image/svg+xml" href="/issa_beauty.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Warm the image CDN connection early (banner + product images / LCP). -->
+  <link rel="preconnect" href="https://ik.imagekit.io" />
+  <!-- Preload the primary UI font weight so first text paints without a swap. -->
+  <link rel="preload" href="/fonts/IBMPlexSansArabic-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
   <!-- Apply the saved theme before first paint to avoid a light-mode flash for
        dark-mode users. Kept inline and tiny so it runs before the app loads. -->
   <script>

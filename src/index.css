@@ -1,7 +1,38 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Self-hosted IBM Plex Sans Arabic (Latin subset), replacing the render-blocking
+   Google Fonts import. Only the weights the UI uses (400/500/600/700); the Arabic
+   glyph range is intentionally excluded until the RTL work adds it. */
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSansArabic-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSansArabic-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSansArabic-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSansArabic-Bold.woff2") format("woff2");
+}
 
 @layer base {
   :root {
@@ -73,7 +104,7 @@
 }
 
 * {
-  font-family: "Inter", "system-ui", sans-serif;
+  font-family: "IBM Plex Sans Arabic", "system-ui", sans-serif;
 }
 ::-webkit-scrollbar {
   width: 4px; /* Width of the scrollbar */
