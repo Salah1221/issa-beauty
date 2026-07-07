@@ -10,6 +10,7 @@ import {
 import { Button } from "@/common/ui/components/button";
 import { useCart, discountedPrice } from "@/features/cart/data/CartContext";
 import { ikUrl } from "@/common/utils/utils";
+import { formatPrice } from "@/common/utils/currency";
 
 export default function CartSheet() {
   const { items, subtotal, setQuantity, removeItem, open, setOpen } = useCart();
@@ -80,7 +81,7 @@ export default function CartSheet() {
                       </Button>
                     </div>
                     <span className="text-sm font-semibold tabular-nums">
-                      ${(discountedPrice(item.price, item.discountPercentage) * item.quantity).toFixed(2)}
+                      {formatPrice(discountedPrice(item.price, item.discountPercentage) * item.quantity)}
                     </span>
                   </div>
                 </div>
@@ -93,7 +94,7 @@ export default function CartSheet() {
           <SheetFooter className="mt-auto flex-col gap-3 border-t pt-4 sm:flex-col sm:space-x-0">
             <div className="flex w-full justify-between text-sm">
               <span>Subtotal</span>
-              <span className="font-semibold">${subtotal.toFixed(2)}</span>
+              <span className="font-semibold">{formatPrice(subtotal)}</span>
             </div>
             <Button className="w-full" onClick={goCheckout}>
               Checkout

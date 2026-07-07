@@ -26,17 +26,17 @@ export default function AccountMenu() {
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-      document.body.classList.toggle("dark", saved === "dark");
-    }
+    // The inline script in index.html already applied the class on <html> before
+    // paint; here we just sync React state to what's on the element.
+    setTheme(
+      document.documentElement.classList.contains("dark") ? "dark" : "light",
+    );
   }, []);
 
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    document.body.classList.toggle("dark", next === "dark");
+    document.documentElement.classList.toggle("dark", next === "dark");
     localStorage.setItem("theme", next);
   };
 

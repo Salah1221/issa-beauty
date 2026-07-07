@@ -25,8 +25,8 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({
       {/* Horizontal strip: the partially-visible next card cues scrollability. */}
       <div className="flex overflow-x-auto pb-4 -mx-4 px-4">
         <div className="flex space-x-4 horizontal-container">
-          {products.map((product, i) => (
-            <div key={i} className="flex-none w-[260px] sm:w-[280px]">
+          {products.map((product) => (
+            <div key={product._id} className="flex-none w-[260px] sm:w-[280px]">
               <ProductCard
                 id={product._id}
                 name={product.name}

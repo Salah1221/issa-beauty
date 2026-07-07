@@ -8,6 +8,8 @@ import {
 } from "@/features/checkout/data/orders";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
+import { formatPrice } from "@/common/utils/currency";
+import Seo from "@/common/seo/Seo";
 import {
   Select,
   SelectContent,
@@ -35,15 +37,39 @@ export default function CheckoutPage() {
   const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0].code);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof typeof form, string>>
+  >({});
 
   const set =
     (key: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       setForm((f) => ({ ...f, [key]: e.target.value }));
+      // Clear this field's error as the user edits it.
+      setFieldErrors((errs) =>
+        errs[key] ? { ...errs, [key]: undefined } : errs,
+      );
+    };
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    const errs: Partial<Record<keyof typeof form, string>> = {};
+    if (!form.fullName.trim()) errs.fullName = "Please enter your full name.";
+    const phoneDigits = form.phone.replace(/\s/g, "");
+    if (!/^\d{6,8}$/.test(phoneDigits))
+      errs.phone = "Enter a valid phone number (6–8 digits).";
+    if (!EMAIL_RE.test(form.email.trim()))
+      errs.email = "Enter a valid email address.";
+    if (!form.address.trim()) errs.address = "Please enter your address.";
+    if (!form.city.trim()) errs.city = "Please enter your city.";
+    return errs;
+  };
 
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6 lg:px-8">
+        <Seo title="Checkout" noIndex />
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
         <p className="mt-2 text-muted-foreground">
           Add some products before checking out.
@@ -60,6 +86,13 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      return;
+    }
+    setFieldErrors({});
     setSubmitting(true);
 
     const input: PlaceOrderInput = {
@@ -91,6 +124,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <Seo title="Checkout" noIndex />
       <h1 className="mb-8 text-3xl font-bold tracking-tight">Checkout</h1>
 
       {/* Mobile: summary first; md+: grid places form left, summary right */}
@@ -106,7 +140,7 @@ export default function CheckoutPage() {
                     {i.name} × {i.quantity}
                   </span>
                   <span className="font-medium tabular-nums">
-                    ${(discountedPrice(i.price, i.discountPercentage) * i.quantity).toFixed(2)}
+                    {formatPrice(discountedPrice(i.price, i.discountPercentage) * i.quantity)}
                   </span>
                 </div>
               ))}
@@ -114,15 +148,15 @@ export default function CheckoutPage() {
             <div className="border-t mt-4 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="tabular-nums">${subtotal.toFixed(2)}</span>
+                <span className="tabular-nums">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Delivery</span>
-                <span className="tabular-nums">${DELIVERY_FEE.toFixed(2)}</span>
+                <span className="tabular-nums">{formatPrice(DELIVERY_FEE)}</span>
               </div>
               <div className="flex justify-between text-base font-semibold pt-1">
                 <span>Total</span>
-                <span className="tabular-nums">${total.toFixed(2)}</span>
+                <span className="tabular-nums">{formatPrice(total)}</span>
               </div>
             </div>
           </div>
@@ -141,7 +175,11 @@ export default function CheckoutPage() {
             required
             autoComplete="name"
             aria-label="Full name"
+            aria-invalid={!!fieldErrors.fullName}
           />
+          {fieldErrors.fullName && (
+            <p className="text-destructive text-xs">{fieldErrors.fullName}</p>
+          )}
           <div className="flex gap-2">
             <Select value={countryCode} onValueChange={setCountryCode}>
               <SelectTrigger className="w-[110px] shrink-0" aria-label="Country code">
@@ -165,8 +203,12 @@ export default function CheckoutPage() {
               required
               autoComplete="tel-national"
               aria-label="Phone number"
+              aria-invalid={!!fieldErrors.phone}
             />
           </div>
+          {fieldErrors.phone && (
+            <p className="text-destructive text-xs">{fieldErrors.phone}</p>
+          )}
           <Input
             type="email"
             inputMode="email"
@@ -176,7 +218,11 @@ export default function CheckoutPage() {
             required
             autoComplete="email"
             aria-label="Email"
+            aria-invalid={!!fieldErrors.email}
           />
+          {fieldErrors.email && (
+            <p className="text-destructive text-xs">{fieldErrors.email}</p>
+          )}
 
           {/* Divider with notch */}
           <div className="relative flex items-center gap-3 my-6">
@@ -195,7 +241,11 @@ export default function CheckoutPage() {
             required
             autoComplete="street-address"
             aria-label="Address"
+            aria-invalid={!!fieldErrors.address}
           />
+          {fieldErrors.address && (
+            <p className="text-destructive text-xs">{fieldErrors.address}</p>
+          )}
           <Input
             placeholder="City *"
             value={form.city}
@@ -203,7 +253,11 @@ export default function CheckoutPage() {
             required
             autoComplete="address-level2"
             aria-label="City"
+            aria-invalid={!!fieldErrors.city}
           />
+          {fieldErrors.city && (
+            <p className="text-destructive text-xs">{fieldErrors.city}</p>
+          )}
           <Input
             placeholder="Area (optional)"
             value={form.area}

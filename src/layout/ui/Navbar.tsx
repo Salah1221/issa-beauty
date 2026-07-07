@@ -2,42 +2,49 @@ import React, { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/common/ui/components/button";
 import { Input } from "@/common/ui/components/input";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import CartSheet from "@/features/cart/ui/CartSheet";
 import AccountMenu from "@/layout/ui/AccountMenu";
 import OrderNotificationsBell from "@/features/orders/ui/OrderNotificationsBell";
 import { useAuth } from "@/features/auth/data/AuthContext";
 
-type NavbarProps = {
-  search: string;
-  setSearch: (search: string) => void;
-};
-
-const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
+const Navbar = () => {
   const { user } = useAuth();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [localSearch, setLocalSearch] = useState(search);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const urlSearch = searchParams.get("search") ?? "";
 
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState(urlSearch);
+
+  // Keep the input in sync when the URL search param changes.
   useEffect(() => {
+    setLocalSearch(urlSearch);
+  }, [urlSearch]);
+
+  // Debounce pushing the local search value to the URL.
+  useEffect(() => {
+    const trimmed = localSearch.trim();
+    if (trimmed === urlSearch) {
+      return;
+    }
+
     const timer = setTimeout(() => {
-      if (localSearch !== search) {
-        setSearch(localSearch);
+      if (trimmed) {
+        navigate("/products?search=" + encodeURIComponent(trimmed));
+      } else if (location.pathname === "/products") {
+        navigate("/products");
       }
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(timer);
-  }, [localSearch, search, setSearch]);
-
-  useEffect(() => {
-    setLocalSearch(search);
-  }, [search]);
-
-  useEffect(() => {
-    const searchInput = document.querySelector<HTMLInputElement>("#search");
-    if (searchInput) {
-      searchInput.value = search;
-    }
-  }, [search]);
+  }, [localSearch, urlSearch, location.pathname, navigate]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -62,7 +69,6 @@ const Navbar: React.FC<NavbarProps> = ({ search, setSearch }) => {
               viewBox="0 0 163 37"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              role="img"
               aria-hidden="true"
             >
               <path

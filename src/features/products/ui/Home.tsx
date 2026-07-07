@@ -22,6 +22,7 @@ import { Button } from "@/common/ui/components/button";
 import { ArrowRight } from "lucide-react";
 import { ikUrl } from "@/common/utils/utils";
 import issaBeautyImg from "@/assets/issa_beauty.png";
+import Seo from "@/common/seo/Seo";
 
 export const SkeletonProductCategory = () => (
   <div className="my-8">
@@ -122,6 +123,10 @@ const Home: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Seo
+        title="Issa Beauty"
+        description="Shop carefully curated beauty and skincare at Issa Beauty, Tripoli, Lebanon — makeup, skincare and more, with cash on delivery."
+      />
       {bannerImages?.length > 0 && (
         <div className="mt-8">
           <Carousel
@@ -134,8 +139,8 @@ const Home: React.FC = () => {
             ]}
           >
             <CarouselContent>
-              {bannerImages.map((bannerImage, index) => (
-                <CarouselItem className="w-full" key={index}>
+              {bannerImages.map((bannerImage) => (
+                <CarouselItem className="w-full" key={bannerImage.imageUrl}>
                   <div className="p-1">
                     <Card className="overflow-hidden">
                       <CardContent className="aspect-video p-0">
@@ -166,12 +171,16 @@ const Home: React.FC = () => {
                   aria-selected={index === currentSlide}
                   aria-label={`Go to slide ${index + 1}`}
                   onClick={() => carouselApi?.scrollTo(index)}
-                  className={`h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    index === currentSlide
-                      ? "w-6 bg-primary"
-                      : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/70"
-                  }`}
-                />
+                  className="flex items-center justify-center py-2 px-1 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
+                >
+                  <span
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      index === currentSlide
+                        ? "w-6 bg-primary"
+                        : "w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/70"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           )}
@@ -185,9 +194,9 @@ const Home: React.FC = () => {
           <SkeletonProductCategory />
         </>
       ) : (
-        Object.entries(productsByCategory).map(([category, products], i) => (
+        Object.entries(productsByCategory).map(([category, products]) => (
           <ProductCategory
-            key={i}
+            key={category}
             title={category}
             products={products}
             onMoreClick={() => navigate(`/products?category=${category}`)}

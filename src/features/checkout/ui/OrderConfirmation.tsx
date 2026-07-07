@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { CircleCheck } from "lucide-react";
 import { Button } from "@/common/ui/components/button";
 import { type PlacedOrder } from "@/features/checkout/data/orders";
+import { formatPrice } from "@/common/utils/currency";
+import Seo from "@/common/seo/Seo";
 
 export default function OrderConfirmation() {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ export default function OrderConfirmation() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
+      <Seo title="Order confirmed" noIndex />
       <div className="text-center">
         <CircleCheck className="mx-auto h-12 w-12 text-green-600" />
         <h1 className="mt-4 text-2xl font-bold">Order placed!</h1>
@@ -46,22 +49,22 @@ export default function OrderConfirmation() {
               <span className="pr-2">
                 {i.name} × {i.quantity}
               </span>
-              <span className="font-medium">${i.lineTotal.toFixed(2)}</span>
+              <span className="font-medium">{formatPrice(i.lineTotal)}</span>
             </div>
           ))}
         </div>
         <div className="mt-4 space-y-1 border-t pt-4 text-sm">
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>${order.subtotal.toFixed(2)}</span>
+            <span>{formatPrice(order.subtotal)}</span>
           </div>
           <div className="flex justify-between">
             <span>Delivery</span>
-            <span>${order.deliveryFee.toFixed(2)}</span>
+            <span>{formatPrice(order.deliveryFee)}</span>
           </div>
           <div className="flex justify-between text-base font-bold">
             <span>Total</span>
-            <span>${order.total.toFixed(2)}</span>
+            <span>{formatPrice(order.total)}</span>
           </div>
         </div>
       </div>

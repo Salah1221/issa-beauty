@@ -29,11 +29,8 @@ import {
 } from "@/common/ui/components/drawer";
 import { Slider } from "@/common/ui/components/slider";
 import { SlidersHorizontal } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
-
-type ProductsProps = {
-  search: string;
-};
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { formatPrice } from "@/common/utils/currency";
 
 const ProductSkeleton = () => (
   <Card className="h-full space-y-4 overflow-hidden">
@@ -45,11 +42,14 @@ const ProductSkeleton = () => (
   </Card>
 );
 
-const Products: React.FC<ProductsProps> = ({ search }) => {
+const Products: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search") ?? "";
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fetchIdRef = useRef(0);
   const [category, setCategory] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("newest");
@@ -98,12 +98,14 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
 
       if (result.type === "error") {
         console.error("Error fetching products:", result.message);
+        setError(result.message);
         setProducts([]);
         setPage(1);
         setLoading(false);
         return;
       }
 
+      setError(null);
       setLoading(false);
       setProducts((prevProducts) =>
         page === 1
@@ -207,8 +209,8 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Categories</SelectItem>
-          {allCategories.map((category, i) => (
-            <SelectItem key={i} value={category.name}>
+          {allCategories.map((category) => (
+            <SelectItem key={category.name} value={category.name}>
               {category.name}
             </SelectItem>
           ))}
@@ -220,7 +222,7 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
           <span className="text-muted-foreground">Price</span>
           <span className="font-medium tabular-nums">
             {priceBounds
-              ? `$${priceValue[0].toFixed(2)} – $${priceValue[1].toFixed(2)}`
+              ? `${formatPrice(priceValue[0])} – ${formatPrice(priceValue[1])}`
               : "—"}
           </span>
         </div>
@@ -294,40 +296,56 @@ const Products: React.FC<ProductsProps> = ({ search }) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
-        {products.length > 0
-          ? products.map((product: Product, i) => (
-              <ProductCard
-                key={i}
-                id={product._id}
-                name={product.name}
-                price={product.price}
-                imageUrl={product.imageUrl}
-                discountPercentage={product.discountPercentage}
-                category={product.category}
-                in_stock={product.in_stock}
-              />
-            ))
-          : !loading &&
-            products.length === 0 && (
-              <div className="col-span-full flex flex-col items-center justify-center gap-3 py-16 text-center">
-                <p className="text-xl font-semibold text-muted-foreground">
-                  No products found
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Try adjusting your filters or browse our full catalog.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setCategory("all");
-                    setAppliedPrice(null);
-                    navigate("/products");
-                  }}
-                >
-                  Browse all products
-                </Button>
-              </div>
-            )}
+        {products.length > 0 &&
+          products.map((product: Product) => (
+            <ProductCard
+              key={product._id}
+              id={product._id}
+              name={product.name}
+              price={product.price}
+              imageUrl={product.imageUrl}
+              discountPercentage={product.discountPercentage}
+              category={product.category}
+              in_stock={product.in_stock}
+            />
+          ))}
+        {error && !loading && (
+          <div className="col-span-full flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-xl font-semibold text-muted-foreground">
+              Something went wrong
+            </p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setError(null);
+                fetchProducts(page);
+              }}
+            >
+              Try again
+            </Button>
+          </div>
+        )}
+        {!error && !loading && products.length === 0 && (
+          <div className="col-span-full flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-xl font-semibold text-muted-foreground">
+              No products found
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Try adjusting your filters or browse our full catalog.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCategory("all");
+                setAppliedPrice(null);
+                navigate("/products");
+              }}
+            >
+              Browse all products
+            </Button>
+          </div>
+        )}
         {loading &&
           Array.from({ length: 12 }).map((_, index) => (
             <ProductSkeleton key={`skeleton-${index}`} />
