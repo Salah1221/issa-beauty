@@ -29,11 +29,11 @@ const Footer = () => {
             <ul className="space-y-3 text-muted-foreground">
               <li>
                 <a
-                  href="mailto:issa.beauty.inc@gmail.com"
+                  href="mailto:Mohamadissa76374336@gmail.com"
                   className="flex items-center hover:text-foreground transition-colors"
                 >
                   <Mail className="w-4 h-4 mr-2 shrink-0" />
-                  issa.beauty.inc@gmail.com
+                  Mohamadissa76374336@gmail.com
                 </a>
               </li>
               <li>
