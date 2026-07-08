@@ -6,8 +6,9 @@
   <link rel="icon" type="image/svg+xml" href="/issa_beauty.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Warm the image CDN connection early (banner + product images / LCP). -->
+  <!-- Warm the image CDN + API connections early (product data + images / LCP). -->
   <link rel="preconnect" href="https://ik.imagekit.io" />
+  <link rel="preconnect" href="https://api.issabeauty.org" crossorigin />
   <!-- Preload the two dominant UI font weights (body + headings/prices). With
        font-display:optional this avoids a swap-reflow while giving them the best
        chance to render on the first paint. -->
