@@ -32,15 +32,17 @@ const Layout: React.FC = () => {
     <>
       <ScrollRestoration />
       <Navbar />
-      <Suspense
-        fallback={
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
-            <Skeleton className="h-64 w-full" />
-          </div>
-        }
-      >
-        <Outlet />
-      </Suspense>
+      <main>
+        <Suspense
+          fallback={
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
+              <Skeleton className="h-64 w-full" />
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
+      </main>
       <Footer />
     </>
   );
