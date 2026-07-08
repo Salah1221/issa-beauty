@@ -155,12 +155,13 @@ const Home: React.FC = () => {
           <SkeletonProductCategory />
         </>
       ) : (
-        Object.entries(productsByCategory).map(([category, products]) => (
+        Object.entries(productsByCategory).map(([category, products], i) => (
           <ProductCategory
             key={category}
             title={category}
             products={products}
             onMoreClick={() => navigate(`/products?category=${category}`)}
+            eagerCount={i === 0 ? 2 : 0}
           />
         ))
       )}
