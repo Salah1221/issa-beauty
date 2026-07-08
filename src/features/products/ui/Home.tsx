@@ -84,6 +84,18 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
+  // Reserve the banner's space only when a previous visit actually saw banners.
+  // This shop has none today (so nothing is reserved → CLS stays 0), but once the
+  // admin uploads banners, returning visitors reserve the slot up front so the
+  // carousel appears without shoving the page down.
+  const [reserveBanner] = useState(() => {
+    try {
+      return localStorage.getItem("ib_has_banners") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [bannersResolved, setBannersResolved] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -94,7 +106,18 @@ const Home: React.FC = () => {
     });
 
     getBannerImages(controller.signal).then((result) => {
-      if (result.type === "success") setBannerImages(result.data);
+      if (result.type === "success") {
+        setBannerImages(result.data);
+        try {
+          localStorage.setItem(
+            "ib_has_banners",
+            result.data.length > 0 ? "1" : "0",
+          );
+        } catch {
+          /* ignore storage errors */
+        }
+      }
+      if (result.type !== "canceled") setBannersResolved(true);
     });
 
     return () => controller.abort();
@@ -106,10 +129,23 @@ const Home: React.FC = () => {
         title="Issa Beauty"
         description="Shop carefully curated beauty and skincare at Issa Beauty, Tripoli, Lebanon — makeup, skincare and more, with cash on delivery."
       />
-      {bannerImages.length > 0 && (
-        <Suspense fallback={null}>
+      {bannerImages.length > 0 ? (
+        <Suspense
+          fallback={
+            <div className="mt-8">
+              <Skeleton className="w-full aspect-video rounded-lg" />
+            </div>
+          }
+        >
           <BannerCarousel images={bannerImages} />
         </Suspense>
+      ) : (
+        reserveBanner &&
+        !bannersResolved && (
+          <div className="mt-8">
+            <Skeleton className="w-full aspect-video rounded-lg" />
+          </div>
+        )
       )}
       <AllProductsSection />
       {isLoading ? (
