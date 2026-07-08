@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <span className="text-lg font-bold">
                   {formatPrice(discountedPrice)}
                 </span>
-                <span className="ml-2 text-sm line-through text-gray-500">
+                <span className="ml-2 text-sm line-through text-muted-foreground">
                   {formatPrice(price)}
                 </span>
               </div>

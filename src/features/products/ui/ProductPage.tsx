@@ -233,7 +233,7 @@ const ProductPage = () => {
             {hasDiscount ? (
               <>
                 {formatPrice(discountedPrice)}
-                <span className="ml-2 text-sm line-through text-gray-500">
+                <span className="ml-2 text-sm line-through text-muted-foreground">
                   {formatPrice(product.price)}
                 </span>
               </>
