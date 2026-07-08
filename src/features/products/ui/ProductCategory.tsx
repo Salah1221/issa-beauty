@@ -7,12 +7,16 @@ type ProductCategoryProps = {
   title: string;
   products: Product[];
   onMoreClick: () => void;
+  /** How many leading cards are above the fold on mobile: they load eagerly, and
+   * the very first also gets fetchpriority=high (the LCP image). 0 = all lazy. */
+  eagerCount?: number;
 };
 
 const ProductCategory: React.FC<ProductCategoryProps> = ({
   title,
   products,
   onMoreClick,
+  eagerCount = 0,
 }) => {
   return (
     <div className="my-8">
@@ -25,7 +29,7 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({
       {/* Horizontal strip: the partially-visible next card cues scrollability. */}
       <div className="flex overflow-x-auto pb-4 -mx-4 px-4">
         <div className="flex space-x-4 horizontal-container">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <div key={product._id} className="flex-none w-[260px] sm:w-[280px]">
               <ProductCard
                 id={product._id}
@@ -35,6 +39,8 @@ const ProductCategory: React.FC<ProductCategoryProps> = ({
                 discountPercentage={product.discountPercentage}
                 category={product.category}
                 in_stock={product.in_stock}
+                priority={eagerCount > 0 && index === 0}
+                eager={index < eagerCount}
               />
             </div>
           ))}

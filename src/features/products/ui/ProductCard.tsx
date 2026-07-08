@@ -17,6 +17,11 @@ type ProductCardProps = {
   discountPercentage?: number;
   category: string;
   in_stock?: boolean;
+  /** The above-the-fold LCP image: load eagerly AND with fetchpriority=high.
+   * Use for exactly one card (a single high hint is strongest). */
+  priority?: boolean;
+  /** Other initially-visible cards: load eagerly (not lazy) but no priority hint. */
+  eager?: boolean;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -27,6 +32,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   discountPercentage,
   category,
   in_stock,
+  priority,
+  eager,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { addItem } = useCart();
@@ -54,7 +61,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ref={imgRef}
           src={ikUrl(imageUrl, "w-400,q-75,f-auto")}
           alt={name}
-          loading="lazy"
+          loading={priority || eager ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
           className={`h-[200px] w-full object-cover transition-all duration-500 group-hover:scale-105 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
