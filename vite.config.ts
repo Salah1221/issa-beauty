@@ -23,8 +23,11 @@ export default defineConfig(({ mode }) => {
           start_url: "/",
           scope: "/",
           lang: "en",
-          theme_color: "#ffffff",
-          background_color: "#ffffff",
+          // Accent WebAPK splash: brand pink fills the launch screen with the
+          // (matching-tile) logo centered. The runtime <meta name="theme-color">
+          // takes over the status bar once the app loads.
+          theme_color: "#e11d48",
+          background_color: "#e11d48",
           display: "standalone",
           icons: [
             { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
