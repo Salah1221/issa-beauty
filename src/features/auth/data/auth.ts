@@ -1,7 +1,15 @@
 import { request } from "@/common/data/ApiClient";
 import { ApiResult } from "@/common/data/ApiResult";
 
-export type AuthUser = { email: string };
+export type UserProfile = {
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  area?: string;
+  notes?: string;
+};
+export type AuthUser = { email: string; profile?: UserProfile };
 
 export const startRegistration = (email: string): Promise<ApiResult<null>> =>
   request({ url: "/api/auth/register/start", method: "POST", data: { email } });
