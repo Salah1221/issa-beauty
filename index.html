@@ -4,7 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/issa_beauty.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light dark" />
+  <!-- iOS: launch "Add to Home Screen" as a real standalone app. -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Issa Beauty" />
 
   <!-- Warm the image CDN + API connections early (product data + images / LCP). -->
   <link rel="preconnect" href="https://ik.imagekit.io" />
@@ -20,9 +28,14 @@
   <script>
     (function () {
       try {
-        if (localStorage.getItem("theme") === "dark") {
-          document.documentElement.classList.add("dark");
-        }
+        var dark = localStorage.getItem("theme") === "dark";
+        var root = document.documentElement;
+        root.classList.toggle("dark", dark);
+        // Declare the scheme + status-bar color so mobile browsers don't force
+        // their own chrome onto the status bar in standalone/installed mode.
+        root.style.colorScheme = dark ? "dark" : "light";
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute("content", dark ? "#0c0a09" : "#ffffff");
       } catch (e) {}
     })();
   </script>

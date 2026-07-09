@@ -36,7 +36,13 @@ export default function AccountMenu() {
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
+    const root = document.documentElement;
+    root.classList.toggle("dark", next === "dark");
+    // Keep the declared scheme + status-bar color in sync (matches index.html).
+    root.style.colorScheme = next;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", next === "dark" ? "#0c0a09" : "#ffffff");
     localStorage.setItem("theme", next);
   };
 
