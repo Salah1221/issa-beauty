@@ -12,6 +12,8 @@ node_modules
 dist
 dist-ssr
 *.local
+# stray build-analyzer output that lands in ./undefined
+undefined
 
 # Editor directories and files
 .vscode/*
