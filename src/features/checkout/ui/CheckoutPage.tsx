@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart, discountedPrice } from "@/features/cart/data/CartContext";
 import {
@@ -17,13 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/common/ui/components/select";
-
-// Supported dialing codes. Lebanon only for now; add entries here to extend.
-const COUNTRY_CODES = [{ code: "+961", label: "🇱🇧 +961" }];
+import { useAuth } from "@/features/auth/data/AuthContext";
+import { COUNTRY_CODES, profileToForm } from "@/features/checkout/data/profileForm";
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [form, setForm] = useState({
     fullName: "",
@@ -34,12 +34,41 @@ export default function CheckoutPage() {
     area: "",
     notes: "",
   });
-  const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0].code);
+  const [countryCode, setCountryCode] = useState<string>(COUNTRY_CODES[0].code);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<keyof typeof form, string>>
   >({});
+
+  // Seed the form once from the logged-in user's saved profile. Only fill fields
+  // the shopper hasn't already typed into, so a late-arriving profile (auth loads
+  // async) never clobbers in-progress input.
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (seededRef.current || !user) return;
+    seededRef.current = true;
+    const { form: seeded, countryCode: seededCode } = profileToForm(user.profile, user.email);
+    setForm((f) => ({
+      fullName: f.fullName || seeded.fullName,
+      phone: f.phone || seeded.phone,
+      email: f.email || seeded.email,
+      address: f.address || seeded.address,
+      city: f.city || seeded.city,
+      area: f.area || seeded.area,
+      notes: f.notes || seeded.notes,
+    }));
+    // seededRef gates the body's mutations to a single run (the effect itself
+    // may still be invoked on any `user` reference change). The setForm
+    // functional updater reads the latest committed state, so typed text is
+    // never clobbered. The `if (!form.phone)` guard instead reads the
+    // render-closure snapshot rather than latest state — harmless today because
+    // there's a single null->user transition and COUNTRY_CODES has one entry
+    // (setting the only code is a no-op); revisit this guard if more dialing
+    // codes are added.
+    if (!form.phone) setCountryCode(seededCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const set =
     (key: keyof typeof form) =>
